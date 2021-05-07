@@ -2,10 +2,16 @@ import React, { useState, useEffect, useMemo } from "react";
 import { View, Text } from "@tarojs/components";
 import Taro from "@tarojs/taro";
 import { AtButton, AtTabBar } from "taro-ui";
+import { useSelector, useDispatch } from "react-redux";
 
 import Search from "../../components/search";
 import History from "../../components/history";
 import User from "../../components/user";
+import {
+  StoreType,
+  UserStateType,
+  asyncUpdateUserInfoFromDb
+} from "../../store";
 
 import "taro-ui/dist/style/components/button.scss"; // 按需引入
 import "taro-ui/dist/style/components/tab-bar.scss"; // 按需引入
@@ -21,36 +27,22 @@ const ComponentMaps = {
 
 const Index = () => {
   const [current, setCurrent] = useState(1);
+  const userInfo = useSelector<StoreType, UserStateType>(state => state.user);
+  const dispatch = useDispatch();
 
   const Component = useMemo(() => ComponentMaps[current], [current]);
 
-  const login = async () => {
-    const wxRes = await Taro.login();
-    const res = await Taro.request({
-      url: "https://doudou0.online/bg/login",
-      data: {
-        code: wxRes.code
-      },
-      method: "POST"
-    });
-    console.log(res);
+  const getUserMessage = () => {
+    try {
+      if (!userInfo.accessToken) return;
+      dispatch(asyncUpdateUserInfoFromDb(userInfo.accessToken));
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   useEffect(() => {
-    login();
-    Taro.getSetting({
-      success(res) {
-        console.log(res);
-        const { authSetting } = res;
-        if (!authSetting["scope.userInfo"]) {
-          Taro.login({
-            success(res) {
-              console.log(res);
-            }
-          });
-        }
-      }
-    });
+    getUserMessage();
   }, []);
 
   return (
