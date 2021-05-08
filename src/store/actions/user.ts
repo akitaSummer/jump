@@ -1,23 +1,43 @@
 import {
   UPDATE_USERPROFILE,
   UPDATE_USERINFOFROMDB,
-  UPDATEACCESSTOKEN
+  UPDATEACCESSTOKEN,
+  SUBMITUSERINFOTODB,
+  CLEARTYPE,
+  ERROR
 } from "../constants";
 import { UserProfileType, UserInfoFromDbType } from "../reducers";
-import { getSetting, getUserInfo } from "../../api";
+import { getSetting, getUserInfo, updateUser } from "../../api";
+import { UserInfoType } from "../../pages/infoEdit";
+
+export const clearType = () => {
+  return {
+    type: CLEARTYPE
+  }
+}
 
 const updateUserProfile = (data?: UserProfileType) => {
-  return {
-    type: UPDATE_USERPROFILE,
-    data
-  };
+  return data
+    ? {
+        type: UPDATE_USERPROFILE,
+        data
+      }
+    : {
+        type: ERROR,
+        data: UPDATE_USERPROFILE
+      };
 };
 
 const updateUserInfoFromDb = (data?: UserInfoFromDbType) => {
-  return {
-    type: UPDATE_USERINFOFROMDB,
-    data
-  };
+  return data
+    ? {
+        type: UPDATE_USERINFOFROMDB,
+        data
+      }
+    : {
+        type: ERROR,
+        data: UPDATE_USERINFOFROMDB
+      };
 };
 
 export const updateAccessToken = (data: string) => {
@@ -25,6 +45,18 @@ export const updateAccessToken = (data: string) => {
     type: UPDATEACCESSTOKEN,
     data
   };
+};
+
+export const submitUserInfoToDb = (data?: UserInfoType) => {
+  return data
+    ? {
+        type: SUBMITUSERINFOTODB,
+        data
+      }
+    : {
+        type: ERROR,
+        data: SUBMITUSERINFOTODB
+      };
 };
 
 export const asyncUpdateUserProfile = () => async dispatch => {
@@ -45,6 +77,20 @@ export const asyncUpdateUserInfoFromDb = (
     dispatch(updateUserInfoFromDb(data));
   } catch (e) {
     dispatch(updateUserInfoFromDb());
+    throw e;
+  }
+};
+
+export const asyncSubmitUserInfoToDb = (
+  access_token: string,
+  info: UserInfoType
+) => async dispatch => {
+  try {
+    await updateUser(access_token, info);
+    dispatch(submitUserInfoToDb(info));
+  } catch (e) {
+    dispatch(submitUserInfoToDb());
+    console.log(e);
     throw e;
   }
 };

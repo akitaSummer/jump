@@ -13,10 +13,6 @@ import {
   asyncUpdateUserInfoFromDb
 } from "../../store";
 
-import "taro-ui/dist/style/components/button.scss"; // 按需引入
-import "taro-ui/dist/style/components/tab-bar.scss"; // 按需引入
-import "taro-ui/dist/style/components/badge.scss"; // 按需引入
-import "taro-ui/dist/style/components/icon.scss"; // 按需引入
 import "./index.scss";
 
 const ComponentMaps = {
@@ -26,7 +22,7 @@ const ComponentMaps = {
 };
 
 const Index = () => {
-  const [current, setCurrent] = useState(1);
+  const [current, setCurrent] = useState(2);
   const userInfo = useSelector<StoreType, UserStateType>(state => state.user);
   const dispatch = useDispatch();
 

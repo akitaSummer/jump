@@ -2,7 +2,10 @@ import Taro from "@tarojs/taro";
 import {
   UPDATE_USERPROFILE,
   UPDATE_USERINFOFROMDB,
-  UPDATEACCESSTOKEN
+  UPDATEACCESSTOKEN,
+  SUBMITUSERINFOTODB,
+  CLEARTYPE,
+  ERROR
 } from "../constants";
 
 export type UserProfileType = {
@@ -30,7 +33,9 @@ export type UserInfoFromDbType = {
   city: string;
   content: string;
   create_time: string;
+  degree: string;
   email: string;
+  exp: number;
   from_id: string;
   headimgurl: null | string;
   id: number;
@@ -55,7 +60,8 @@ export type UserStateType = {
   accessToken: null | string;
   // 广告
   showAdvertise: boolean;
-  actionType: string
+  actionType: string;
+  errMsg: string;
 };
 
 export const INITIAL_STATE: UserStateType = {
@@ -67,7 +73,9 @@ export const INITIAL_STATE: UserStateType = {
     city: "",
     content: "",
     create_time: "",
+    degree: "",
     email: "",
+    exp: 0,
     from_id: "",
     headimgurl: null,
     id: -996,
@@ -85,7 +93,8 @@ export const INITIAL_STATE: UserStateType = {
   accessToken: Taro.getStorageSync("loginSessionKey"),
   // 广告
   showAdvertise: false,
-  actionType: 'DEFAULT'
+  actionType: "DEFAULT",
+  errMsg: ""
 };
 
 export default (state = INITIAL_STATE, actions) => {
@@ -94,25 +103,17 @@ export default (state = INITIAL_STATE, actions) => {
       return {
         ...state,
         actionType: actions.type,
-        userProfile: actions.data
-          ? {
-              ...actions.data
-            }
-          : {
-              ...state.userProfile
-            }
+        userProfile: {
+          ...actions.data
+        }
       };
     case UPDATE_USERINFOFROMDB:
       return {
         ...state,
         actionType: actions.type,
-        userInfoFromDb: actions.data
-          ? {
-              ...actions.data
-            }
-          : {
-              ...state.userInfoFromDb
-            }
+        userInfoFromDb: {
+          ...actions.data
+        }
       };
     case UPDATEACCESSTOKEN:
       return {
@@ -120,10 +121,30 @@ export default (state = INITIAL_STATE, actions) => {
         actionType: actions.type,
         accessToken: actions.data
       };
+    case SUBMITUSERINFOTODB:
+      return {
+        ...state,
+        actionType: actions.type,
+        userInfoFromDb: {
+          ...state.userInfoFromDb,
+          ...actions.data
+        }
+      };
+    case ERROR:
+      return {
+        ...state,
+        actionType: actions.type,
+        errMsg: actions.data
+      };
+    case CLEARTYPE:
+      return {
+        ...state,
+        actionType: CLEARTYPE
+      };
     default:
       return {
-          ...state,
-          actionType: actions.type,
+        ...state,
+        actionType: actions.type
       };
   }
 };

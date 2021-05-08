@@ -10,7 +10,8 @@ import {
   UserStateType,
   updateAccessToken,
   asyncUpdateUserInfoFromDb,
-  UPDATE_USERINFOFROMDB
+  UPDATE_USERINFOFROMDB,
+  ERROR
 } from "../../store";
 import { wxLogin, login as dbLogin } from "../../api";
 
@@ -90,6 +91,10 @@ const User: React.FC<{}> = () => {
     }
   };
 
+  const goToInfoEdit = () => {
+    Taro.navigateTo({ url: "/pages/infoEdit/index" });
+  };
+
   useEffect(() => {
     Taro.setNavigationBarTitle({
       title: "我的"
@@ -107,7 +112,7 @@ const User: React.FC<{}> = () => {
     if (
       toastOpen &&
       !userInfo.userInfoFromDb.nickname &&
-      userInfo.actionType === UPDATE_USERINFOFROMDB
+      userInfo.actionType === ERROR
     ) {
       setToastStatus(ToastStatus.Error);
     }
@@ -152,7 +157,10 @@ const User: React.FC<{}> = () => {
           )}
         </View>
         {userInfo.userInfoFromDb.nickname && userInfo.accessToken && (
-          <View className={classnames("at-icon", "at-icon-chevron-right")} />
+          <View
+            className={classnames("at-icon", "at-icon-chevron-right")}
+            onClick={goToInfoEdit}
+          />
         )}
       </View>
       {userInfo.userInfoFromDb.nickname &&
