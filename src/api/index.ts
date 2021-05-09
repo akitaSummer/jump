@@ -1,6 +1,6 @@
 import Taro from "@tarojs/taro";
 
-import { UserInfoType } from "../pages/infoEdit";
+import { UserInfoEditType } from "../store";
 
 const userUrl = "https://doudou0.online/bg";
 
@@ -25,7 +25,10 @@ export const getUserInfo = async (access_token: string) =>
     method: "GET"
   });
 
-export const updateUser = async (access_token: string, data: UserInfoType) =>
+export const updateUser = async (
+  access_token: string,
+  data: UserInfoEditType
+) =>
   await Taro.request({
     header: {
       AccessToken: access_token

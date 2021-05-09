@@ -5,6 +5,8 @@ import {
   UPDATEACCESSTOKEN,
   SUBMITUSERINFOTODB,
   CLEARTYPE,
+  UPDATE_USERINFOEDIT,
+  RESET_USERINFOEDIT,
   ERROR
 } from "../constants";
 
@@ -49,7 +51,19 @@ export type UserInfoFromDbType = {
   tips: string;
 };
 
+export type UserInfoEditType = {
+  name: string;
+  phone: string;
+  email: string;
+  school: string;
+  degree: string;
+  exp: number;
+  tips: string;
+};
+
 export type UserStateType = {
+  // 用户编辑页信息
+  userInfoEdit: UserInfoEditType;
   // 用户授权登录
   userProfile: UserProfileType;
   hasUserInfo: boolean;
@@ -65,6 +79,16 @@ export type UserStateType = {
 };
 
 export const INITIAL_STATE: UserStateType = {
+  // 用户编辑页信息
+  userInfoEdit: {
+    name: "",
+    phone: "",
+    email: "",
+    school: "",
+    degree: "",
+    exp: 0,
+    tips: ""
+  },
   // 用户授权登录
   userProfile: {},
   hasUserInfo: false,
@@ -107,14 +131,25 @@ export default (state = INITIAL_STATE, actions) => {
           ...actions.data
         }
       };
-    case UPDATE_USERINFOFROMDB:
+    case UPDATE_USERINFOFROMDB: {
+      const { name, phone, email, school, degree, exp, tips } = actions;
       return {
         ...state,
         actionType: actions.type,
         userInfoFromDb: {
           ...actions.data
+        },
+        userInfoEdit: {
+          name,
+          phone,
+          email,
+          school,
+          degree,
+          exp,
+          tips
         }
       };
+    }
     case UPDATEACCESSTOKEN:
       return {
         ...state,
@@ -128,8 +163,44 @@ export default (state = INITIAL_STATE, actions) => {
         userInfoFromDb: {
           ...state.userInfoFromDb,
           ...actions.data
+        },
+        userInfoEdit: {
+          ...actions.data
         }
       };
+    case UPDATE_USERINFOEDIT:
+      return {
+        ...state,
+        actionType: actions.type,
+        userInfoEdit: {
+          ...state.userInfoEdit,
+          [actions.data.type]: actions.data.value
+        }
+      };
+    case RESET_USERINFOEDIT: {
+      const {
+        name,
+        phone,
+        email,
+        school,
+        degree,
+        exp,
+        tips
+      } = state.userInfoFromDb;
+      return {
+        ...state,
+        actionType: actions.type,
+        userInfoEdit: {
+          name,
+          phone,
+          email,
+          school,
+          degree,
+          exp,
+          tips
+        }
+      };
+    }
     case ERROR:
       return {
         ...state,

@@ -4,17 +4,38 @@ import {
   UPDATEACCESSTOKEN,
   SUBMITUSERINFOTODB,
   CLEARTYPE,
+  UPDATE_USERINFOEDIT,
+  RESET_USERINFOEDIT,
   ERROR
 } from "../constants";
-import { UserProfileType, UserInfoFromDbType } from "../reducers";
+import {
+  UserProfileType,
+  UserInfoFromDbType,
+  UserInfoEditType
+} from "../reducers";
 import { getSetting, getUserInfo, updateUser } from "../../api";
-import { UserInfoType } from "../../pages/infoEdit";
+
+export const restUserInfoEdit = () => {
+  return {
+    type: RESET_USERINFOEDIT
+  };
+};
+
+export const updateUserInfoEdit = (value, type) => {
+  return {
+    type: UPDATE_USERINFOEDIT,
+    data: {
+      type,
+      value
+    }
+  };
+};
 
 export const clearType = () => {
   return {
     type: CLEARTYPE
-  }
-}
+  };
+};
 
 const updateUserProfile = (data?: UserProfileType) => {
   return data
@@ -47,7 +68,7 @@ export const updateAccessToken = (data: string) => {
   };
 };
 
-export const submitUserInfoToDb = (data?: UserInfoType) => {
+export const submitUserInfoToDb = (data?: UserInfoEditType) => {
   return data
     ? {
         type: SUBMITUSERINFOTODB,
@@ -83,7 +104,7 @@ export const asyncUpdateUserInfoFromDb = (
 
 export const asyncSubmitUserInfoToDb = (
   access_token: string,
-  info: UserInfoType
+  info: UserInfoEditType
 ) => async dispatch => {
   try {
     await updateUser(access_token, info);

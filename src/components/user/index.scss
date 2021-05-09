@@ -1,9 +1,4 @@
-@import "~taro-ui/dist/style/components/flex.scss";
-@import "~taro-ui/dist/style/components/avatar.scss";
-@import "~taro-ui/dist/style/components/icon.scss";
-@import "~taro-ui/dist/style/components/button.scss";
-@import "~taro-ui/dist/style/components/toast.scss";
-@import "~taro-ui/dist/style/components/input.scss";
+@import '../../app.scss';
 .user-avatar {
     height: 200px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
@@ -53,5 +48,16 @@
     }
     .item_name {
         width: 144px;
+    }
+    .at-tag--active {
+        margin-right: 24px;
+        &:nth-child(2) {
+            background-color: $my-pick;
+            border-color: $my-pick;
+        }
+        &:nth-child(3) {
+            background-color: $my-green;
+            border-color: $my-green;
+        }
     }
 }

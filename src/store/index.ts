@@ -32,6 +32,8 @@ export type StoreType = {
 
 export { UserStateType } from "./reducers";
 
+export * from "./reducers";
+
 export * from "./actions";
 
 export * from "./constants";

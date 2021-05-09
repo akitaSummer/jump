@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { View, Text, Picker, ScrollView } from "@tarojs/components";
-import Taro from "@tarojs/taro";
+import Taro, { getCurrentInstance } from "@tarojs/taro";
 import {
   AtForm,
   AtButton,
@@ -8,16 +8,23 @@ import {
   AtList,
   AtListItem,
   AtMessage,
-  AtToast
+  AtToast,
+  AtSearchBar,
+  AtFloatLayout,
+  AtTag
 } from "taro-ui";
 import { useSelector, useDispatch } from "react-redux";
 
+// import AtFloatLayout from "../../components/float-layout";
 import {
   StoreType,
   UserStateType,
   asyncSubmitUserInfoToDb,
   clearType,
+  updateUserInfoEdit,
+  restUserInfoEdit,
   SUBMITUSERINFOTODB,
+  UPDATE_USERINFOEDIT,
   ERROR
 } from "../../store";
 import { schoolList, degreeList } from "../../utils";
@@ -25,45 +32,17 @@ import { schoolList, degreeList } from "../../utils";
 import "./index.scss";
 import classNames from "classnames";
 
-export type UserInfoType = {
-  name: string;
-  phone: string;
-  email: string;
-  school: string;
-  degree: string;
-  exp: number;
-  tips: string;
-};
-
 const InfoEdit = () => {
-  const [info, setInfo] = useState<UserInfoType>({
-    name: "",
-    phone: "",
-    email: "",
-    school: "",
-    degree: "",
-    exp: 0,
-    tips: ""
-  });
   const [toastOpen, setToastOpen] = useState(false);
   const [school, setSchool] = useState([...schoolList]);
   const [schoolListShow, setSchoolListShow] = useState(false);
   const userInfo = useSelector<StoreType, UserStateType>(state => state.user);
   const dispatch = useDispatch();
+  const info = useMemo(() => userInfo.userInfoEdit, [userInfo]);
+  const [schoolSearchValue, setSchoolSearchValue] = useState(info.school);
 
   const reset = () => {
-    const {
-      userInfoFromDb: { name, phone, email, school, exp, tips, degree }
-    } = userInfo;
-    setInfo({
-      name,
-      phone,
-      email,
-      school,
-      degree,
-      exp,
-      tips
-    });
+    dispatch(restUserInfoEdit());
   };
 
   const submit = () => {
@@ -80,31 +59,39 @@ const InfoEdit = () => {
         message: "个人信息必须填写完整",
         type: "error"
       });
+      return;
     }
     dispatch(asyncSubmitUserInfoToDb(userInfo.accessToken, info));
   };
 
   const handleChange = (value, target) => {
-    console.log(value);
-    setInfo({
-      ...info,
-      [target]: value
-    });
+    dispatch(updateUserInfoEdit(value, target));
     // 在小程序中，如果想改变 value 的值，需要 `return value` 从而改变输入框的当前值
     return value;
   };
 
   useEffect(() => {
-    reset();
+    if (userInfo.actionType !== UPDATE_USERINFOEDIT) reset();
   }, []);
 
   useEffect(() => {
-    setSchool([
+    const newList = [
       ...schoolList.filter(item => {
-        return item.includes(info.school);
+        return item.includes(schoolSearchValue);
       })
-    ]);
-  }, [info.school]);
+    ];
+    setSchool(
+      newList.length === 0
+        ? !!schoolSearchValue
+          ? [schoolSearchValue]
+          : [...schoolList]
+        : [
+            ...schoolList.filter(item => {
+              return item.includes(schoolSearchValue);
+            })
+          ]
+    );
+  }, [schoolSearchValue]);
 
   useEffect(() => {
     if (userInfo.actionType === SUBMITUSERINFOTODB) {
@@ -141,9 +128,6 @@ const InfoEdit = () => {
           placeholder="请输入您的真实姓名"
           value={info.name}
           onChange={v => handleChange(v, "name")}
-          onFocus={() => {
-            setSchoolListShow(false);
-          }}
         />
         <AtInput
           name="phone"
@@ -152,9 +136,6 @@ const InfoEdit = () => {
           placeholder="请输入您的手机号"
           value={info.phone}
           onChange={v => handleChange(v, "phone")}
-          onFocus={() => {
-            setSchoolListShow(false);
-          }}
         />
         <AtInput
           name="email"
@@ -163,54 +144,22 @@ const InfoEdit = () => {
           placeholder="请输入您的email"
           value={info.email}
           onChange={v => handleChange(v, "email")}
-          onFocus={() => {
-            setSchoolListShow(false);
-          }}
         />
-        <AtInput
-          name="school"
-          title="school"
-          type="text"
-          placeholder="请输入您的毕业院校"
-          value={info.school}
-          onChange={v => {
-            schoolListShow && handleChange(v, "school");
-          }}
-          onFocus={() => {
-            setSchoolListShow(true);
-          }}
-          // onBlur={v => {
-          //   console.log(v);
-          //   handleChange(info.school, "school");
-          // }}
-        />
-        <ScrollView
-          className={classNames("scrollview", "school-scroll-view", {
-            "list-show": schoolListShow
-          })}
-          scrollY
-          scrollWithAnimation
-          scrollTop={0}
-          lowerThreshold={0}
-          upperThreshold={0}
-          onScrollToUpper={() => {}} // 使用箭头函数的时候 可以这样写 `onScrollToUpper={this.onScrollToUpper}`
-        >
-          <AtList className={classNames("school-list")}>
-            {school.map((item, i) => {
-              return (
-                <AtListItem
-                  className={classNames("school-list-item")}
-                  title={item}
-                  key={item + i}
-                  onClick={() => {
-                    setSchoolListShow(false);
-                    handleChange(item, "school");
-                  }}
-                />
-              );
+        <View className={classNames("form-item")}>
+          <View className={classNames("item-title")}>
+            <Text>毕业院校</Text>
+          </View>
+          <Text
+            className={classNames("item-value", {
+              "item-empty": info.school
             })}
-          </AtList>
-        </ScrollView>
+            onClick={() => {
+              setSchoolListShow(true);
+            }}
+          >
+            {info.school || "请选择您的院校"}
+          </Text>
+        </View>
         <View className={classNames("degree-list")}>
           <Picker
             mode="selector"
@@ -231,21 +180,30 @@ const InfoEdit = () => {
           placeholder="请输入您的工作年限"
           value={`${info.exp}`}
           onChange={v => handleChange(v, "exp")}
-          onFocus={() => {
-            setSchoolListShow(false);
-          }}
         />
-        <AtInput
-          name="tips"
-          title="意向岗位"
-          type="text"
-          placeholder="请输入您的意向岗位，如有多项请用“,”分隔"
-          value={info.tips}
-          onChange={v => handleChange(v, "tips")}
-          onFocus={() => {
-            setSchoolListShow(false);
-          }}
-        />
+        <View className={classNames("form-item")}>
+          <View className={classNames("item-title")}>
+            <Text>意向岗位</Text>
+          </View>
+          <View
+            className={classNames("item-value", {
+              "item-empty": info.tips
+            })}
+            onClick={() => {
+              Taro.navigateTo({ url: "/pages/tipsChoose/index" });
+            }}
+          >
+            {!!info.tips ? (
+              info.tips.split(",").map((item, i) => (
+                <AtTag key={item + i} type="primary" circle active>
+                  {item}
+                </AtTag>
+              ))
+            ) : (
+              <Text>"请选择您的意向岗位，最多三个"</Text>
+            )}
+          </View>
+        </View>
         <View
           className={classNames("button-group", {
             ios: Taro.getSystemInfoSync().system.includes("iOS")
@@ -266,6 +224,45 @@ const InfoEdit = () => {
           </AtButton>
         </View>
       </AtForm>
+      <AtFloatLayout
+        isOpened={schoolListShow}
+        title="请选择院校"
+        onClose={() => {
+          setSchoolListShow(false);
+        }}
+      >
+        <View className={classNames("school-float")}>
+          <AtSearchBar
+            actionName="清空"
+            value={schoolSearchValue}
+            onChange={v => {
+              setSchoolSearchValue(v);
+            }}
+            onActionClick={() => {
+              setSchoolSearchValue("");
+            }}
+          />
+          <ScrollView scrollY className={classNames("scroll-container")}>
+            <AtList className={classNames("school-list")}>
+              {school.map((item, i) => {
+                return (
+                  <AtListItem
+                    className={classNames("school-list-item", {
+                      "school-select": item === info.school
+                    })}
+                    title={item}
+                    key={item + i}
+                    onClick={() => {
+                      setSchoolListShow(false);
+                      handleChange(item, "school");
+                    }}
+                  />
+                );
+              })}
+            </AtList>
+          </ScrollView>
+        </View>
+      </AtFloatLayout>
       <AtToast
         duration={0}
         isOpened={toastOpen}

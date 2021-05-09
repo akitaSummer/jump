@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import classnames from "classnames";
 import { View, Text } from "@tarojs/components";
-import { AtAvatar, AtToast, AtButton, AtInput } from "taro-ui";
+import { AtAvatar, AtToast, AtButton, AtTag } from "taro-ui";
 import Taro from "@tarojs/taro";
 import { useSelector, useDispatch } from "react-redux";
 
@@ -173,7 +173,15 @@ const User: React.FC<{}> = () => {
               <Text className={classnames("item_name")}>
                 {showInfoMap[item].name}
               </Text>
-              <Text>{userInfo.userInfoFromDb[item]}</Text>
+              <View>
+                {item === "tips"
+                  ? userInfo.userInfoFromDb[item].split(",").map((item, i) => (
+                      <AtTag key={item + i} type="primary" circle active>
+                        {item}
+                      </AtTag>
+                    ))
+                  : userInfo.userInfoFromDb[item]}
+              </View>
             </View>
           );
         })}
