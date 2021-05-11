@@ -1,57 +1,69 @@
 @font-face {
-    font-family: "iconfont";
-    /* Project id  */
-    src: url('iconfont.ttf?t=1620382233390') format('truetype');
+  font-family: "iconfont"; /* Project id  */
+  src: url('iconfont.ttf?t=1620724134895') format('truetype');
 }
 
 .iconfont {
-    font-family: "iconfont" !important;
-    font-size: 16px;
-    font-style: normal;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .icon-school:before {
-    content: "\e6d9";
+  content: "\e6d9";
+}
+
+.icon-shengyutianshu:before {
+  content: "\e60b";
+}
+
+.icon-file:before {
+  content: "\e72f";
 }
 
 .icon-name:before {
-    content: "\e74c";
+  content: "\e74c";
+}
+
+.icon-filesearch:before {
+  content: "\e605";
 }
 
 .icon-shangquan:before {
-    content: "\e8b6";
+  content: "\e8b6";
 }
 
 .icon-shequ:before {
-    content: "\e8b8";
+  content: "\e8b8";
 }
 
 .icon-shuju:before {
-    content: "\e8b9";
+  content: "\e8b9";
 }
 
 .icon-sousuo:before {
-    content: "\e8ba";
+  content: "\e8ba";
 }
 
 .icon-sex:before {
-    content: "\e653";
+  content: "\e653";
 }
 
 .icon-city:before {
-    content: "\e686";
+  content: "\e686";
 }
 
 .icon-academicdegree:before {
-    content: "\e828";
+  content: "\e828";
 }
 
 .icon-email:before {
-    content: "\e5c8";
+  content: "\e5c8";
 }
 
 .icon-line-codesslashdaimasxiegang:before {
-    content: "\e6f1";
+  content: "\e6f1";
 }
+

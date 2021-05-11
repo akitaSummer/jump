@@ -10,7 +10,8 @@ import User from "../../components/user";
 import {
   StoreType,
   UserStateType,
-  asyncUpdateUserInfoFromDb
+  asyncUpdateUserInfoFromDb,
+  asyncGetUserFiles
 } from "../../store";
 
 import "./index.scss";
@@ -22,7 +23,7 @@ const ComponentMaps = {
 };
 
 const Index = () => {
-  const [current, setCurrent] = useState(2);
+  const [current, setCurrent] = useState(1);
   const userInfo = useSelector<StoreType, UserStateType>(state => state.user);
   const dispatch = useDispatch();
 
@@ -32,6 +33,7 @@ const Index = () => {
     try {
       if (!userInfo.accessToken) return;
       dispatch(asyncUpdateUserInfoFromDb(userInfo.accessToken));
+      dispatch(asyncGetUserFiles(userInfo.accessToken));
     } catch (e) {
       console.log(e);
     }

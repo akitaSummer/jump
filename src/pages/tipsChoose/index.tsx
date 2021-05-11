@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, ScrollView } from "@tarojs/components";
 import Taro from "@tarojs/taro";
 import { AtButton, AtMessage } from "taro-ui";
 import { useSelector, useDispatch } from "react-redux";
 
-import { StoreType, UserStateType, updateUserInfoEdit } from "../../store";
+import { StoreType, UserStateType, updateUserInfoEditTips } from "../../store";
 import { tipsList } from "../../utils";
 
 import "./index.scss";
@@ -13,10 +13,9 @@ import classNames from "classnames";
 const TipsChoose = () => {
   const userInfo = useSelector<StoreType, UserStateType>(state => state.user);
   const dispatch = useDispatch();
+  const [saveClick, setSaveClick] = useState(false);
   const [activeTrade, setActiveTrade] = useState(tipsList[0].trade);
-  const [tips, setTips] = useState([
-    ...userInfo.userInfoFromDb.tips.split(",")
-  ]);
+  const [tips, setTips] = useState([...userInfo.userInfoEdit.tips.split(",")]);
 
   const handleTradeChange = (item: string) => {
     setActiveTrade(item);
@@ -36,9 +35,27 @@ const TipsChoose = () => {
   };
 
   const saveTips = () => {
-    dispatch(updateUserInfoEdit(tips.join(","), "tips"));
-    Taro.navigateBack();
+    setSaveClick(true);
   };
+
+  useEffect(() => {
+    setSaveClick(false);
+    return () => {
+      if (!saveClick) {
+        dispatch(updateUserInfoEditTips(userInfo.userInfoEdit.tips));
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (saveClick) {
+      Taro.navigateBack({
+        complete: () => {
+          dispatch(updateUserInfoEditTips(tips.join(",")));
+        }
+      });
+    }
+  }, [saveClick]);
 
   return (
     <View

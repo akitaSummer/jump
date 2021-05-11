@@ -11,7 +11,9 @@ import {
   updateAccessToken,
   asyncUpdateUserInfoFromDb,
   UPDATE_USERINFOFROMDB,
-  ERROR
+  userClearType,
+  USER_ERROR,
+  asyncGetUserFiles
 } from "../../store";
 import { wxLogin, login as dbLogin } from "../../api";
 
@@ -84,6 +86,7 @@ const User: React.FC<{}> = () => {
       Taro.setStorageSync("loginSessionKey", access_token);
       dispatch(updateAccessToken(access_token));
       dispatch(asyncUpdateUserInfoFromDb(access_token));
+      dispatch(asyncGetUserFiles(access_token));
     } catch (e) {
       console.log(e);
       setToastStatus(ToastStatus.Error);
@@ -92,7 +95,12 @@ const User: React.FC<{}> = () => {
   };
 
   const goToInfoEdit = () => {
-    Taro.navigateTo({ url: "/pages/infoEdit/index" });
+    Taro.navigateTo({
+      url: "/pages/infoEdit/index",
+      complete: () => {
+        dispatch(userClearType());
+      }
+    });
   };
 
   useEffect(() => {
@@ -112,7 +120,7 @@ const User: React.FC<{}> = () => {
     if (
       toastOpen &&
       !userInfo.userInfoFromDb.nickname &&
-      userInfo.actionType === ERROR
+      userInfo.actionType === USER_ERROR
     ) {
       setToastStatus(ToastStatus.Error);
     }
@@ -185,6 +193,25 @@ const User: React.FC<{}> = () => {
             </View>
           );
         })}
+      {userInfo.userInfoFromDb.nickname && (
+        <View className={classnames("info_item")}>
+          <View className={classnames("iconfont", "icon-filesearch")}></View>
+          <Text className={classnames("item_name")}>简历</Text>
+          <View
+            className={classnames("value-right")}
+            onClick={() => {
+              Taro.navigateTo({
+                url: "/pages/fileDetail/index",
+                complete: () => {
+                  dispatch(userClearType());
+                }
+              });
+            }}
+          >
+            <View className={classnames("at-icon", "at-icon-chevron-right")} />
+          </View>
+        </View>
+      )}
       <AtToast
         duration={0}
         isOpened={toastOpen}

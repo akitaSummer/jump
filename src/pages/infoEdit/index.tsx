@@ -18,25 +18,30 @@ import { useSelector, useDispatch } from "react-redux";
 // import AtFloatLayout from "../../components/float-layout";
 import {
   StoreType,
+  DatasStateType,
   UserStateType,
   asyncSubmitUserInfoToDb,
-  clearType,
+  userClearType,
   updateUserInfoEdit,
+  asyncUpdateSchoolList,
+  updateSchoolList,
   restUserInfoEdit,
   SUBMITUSERINFOTODB,
-  UPDATE_USERINFOEDIT,
-  ERROR
+  UPDATE_USERINFOEDITTIPS,
+  USER_ERROR
 } from "../../store";
-import { schoolList, degreeList } from "../../utils";
+import { degreeList } from "../../utils";
 
 import "./index.scss";
 import classNames from "classnames";
 
 const InfoEdit = () => {
   const [toastOpen, setToastOpen] = useState(false);
-  const [school, setSchool] = useState([...schoolList]);
   const [schoolListShow, setSchoolListShow] = useState(false);
   const userInfo = useSelector<StoreType, UserStateType>(state => state.user);
+  const datas = useSelector<StoreType, DatasStateType>(state => state.datas);
+  const schoolList = useMemo(() => datas.schoolList, [datas]);
+  const [school, setSchool] = useState([...schoolList]);
   const dispatch = useDispatch();
   const info = useMemo(() => userInfo.userInfoEdit, [userInfo]);
   const [schoolSearchValue, setSchoolSearchValue] = useState(info.school);
@@ -71,27 +76,28 @@ const InfoEdit = () => {
   };
 
   useEffect(() => {
-    if (userInfo.actionType !== UPDATE_USERINFOEDIT) reset();
+    dispatch(updateSchoolList([]));
+    if (userInfo.actionType !== UPDATE_USERINFOEDITTIPS) reset();
   }, []);
 
   useEffect(() => {
-    const newList = [
-      ...schoolList.filter(item => {
-        return item.includes(schoolSearchValue);
-      })
-    ];
+    if (!!schoolSearchValue) {
+      dispatch(asyncUpdateSchoolList(schoolSearchValue));
+    } else {
+      dispatch(updateSchoolList([]));
+    }
+  }, [schoolSearchValue]);
+
+  useEffect(() => {
+    const newList = [...schoolList];
     setSchool(
       newList.length === 0
         ? !!schoolSearchValue
           ? [schoolSearchValue]
-          : [...schoolList]
-        : [
-            ...schoolList.filter(item => {
-              return item.includes(schoolSearchValue);
-            })
-          ]
+          : newList
+        : newList
     );
-  }, [schoolSearchValue]);
+  }, [schoolList]);
 
   useEffect(() => {
     if (userInfo.actionType === SUBMITUSERINFOTODB) {
@@ -100,9 +106,9 @@ const InfoEdit = () => {
       setTimeout(() => {
         Taro.navigateBack();
         setToastOpen(false);
-        dispatch(clearType());
+        dispatch(userClearType());
       }, 500);
-    } else if (userInfo.actionType === ERROR) {
+    } else if (userInfo.actionType === USER_ERROR) {
       Taro.atMessage({
         message: "更新失败",
         type: "error"

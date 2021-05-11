@@ -2,7 +2,9 @@ export default {
   pages: [
     "pages/index/index",
     "pages/infoEdit/index",
-    "pages/tipsChoose/index"
+    "pages/tipsChoose/index",
+    "pages/fileDetail/index",
+    "pages/webView/index",
   ],
   window: {
     backgroundTextStyle: "light",

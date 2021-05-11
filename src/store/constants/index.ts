@@ -1,3 +1,2 @@
 export * from "./user";
-
-export const ERROR = "ERROR";
+export * from "./datas";

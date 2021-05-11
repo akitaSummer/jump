@@ -4,10 +4,14 @@ import {
   UPDATE_USERINFOFROMDB,
   UPDATEACCESSTOKEN,
   SUBMITUSERINFOTODB,
-  CLEARTYPE,
+  USER_ERROR,
   UPDATE_USERINFOEDIT,
   RESET_USERINFOEDIT,
-  ERROR
+  UPDATE_USERINFOEDITTIPS,
+  USER_CLEARTYPE,
+  UPDATE_USERFILE,
+  GET_USERFILES,
+  DELETE_USERFILE
 } from "../constants";
 
 export type UserProfileType = {
@@ -61,6 +65,12 @@ export type UserInfoEditType = {
   tips: string;
 };
 
+export type UserFileType = {
+  id: number;
+  path: string;
+  name: string;
+};
+
 export type UserStateType = {
   // 用户编辑页信息
   userInfoEdit: UserInfoEditType;
@@ -69,6 +79,7 @@ export type UserStateType = {
   hasUserInfo: boolean;
   // 后台获取用户信息
   userInfoFromDb: UserInfoFromDbType;
+  userFiles: UserFileType[];
   hasUserInfoFromDb: Boolean;
   // 登录token
   accessToken: null | string;
@@ -112,6 +123,7 @@ export const INITIAL_STATE: UserStateType = {
     status: "",
     tips: ""
   },
+  userFiles: [],
   hasUserInfoFromDb: false,
   // 登录token
   accessToken: Taro.getStorageSync("loginSessionKey"),
@@ -177,6 +189,15 @@ export default (state = INITIAL_STATE, actions) => {
           [actions.data.type]: actions.data.value
         }
       };
+    case UPDATE_USERINFOEDITTIPS:
+      return {
+        ...state,
+        actionType: actions.type,
+        userInfoEdit: {
+          ...state.userInfoEdit,
+          tips: actions.data
+        }
+      };
     case RESET_USERINFOEDIT: {
       const {
         name,
@@ -201,16 +222,23 @@ export default (state = INITIAL_STATE, actions) => {
         }
       };
     }
-    case ERROR:
+    case UPDATE_USERFILE:
+    case GET_USERFILES:
+    case DELETE_USERFILE:
+      return {
+        ...state,
+        userFiles: actions.data
+      };
+    case USER_ERROR:
       return {
         ...state,
         actionType: actions.type,
         errMsg: actions.data
       };
-    case CLEARTYPE:
+    case USER_CLEARTYPE:
       return {
         ...state,
-        actionType: CLEARTYPE
+        actionType: USER_CLEARTYPE
       };
     default:
       return {
