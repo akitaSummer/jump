@@ -48,6 +48,7 @@
         "react-redux": "^7.2.4",
         "redux": "^4.1.0",
         "redux-thunk": "^2.3.0",
+        "taro-listview": "^2.0.4",
         "taro-ui": "^3.0.0-alpha.3"
     },
     "devDependencies": {

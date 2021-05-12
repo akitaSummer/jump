@@ -83,9 +83,13 @@ const FileDetail = () => {
           disabled={userInfo.userFiles.length >= 3}
           className={classNames("submit-button")}
           onClick={() => {
+            Taro.atMessage({
+              message: "简历上传中",
+              type: "warning"
+            });
             Taro.chooseMessageFile({
               count: 1,
-              extension: [".pdf", ".word"],
+              extension: ["pdf", "word"],
               type: "file",
               success: data => {
                 const { tempFiles } = data;
@@ -97,6 +101,12 @@ const FileDetail = () => {
                     path
                   )
                 );
+              },
+              fail: () => {
+                Taro.atMessage({
+                  message: "简历上传失败",
+                  type: "error"
+                });
               }
             });
           }}

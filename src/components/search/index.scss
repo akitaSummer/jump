@@ -1,0 +1,42 @@
+@import "~taro-listview/dist/style/index.scss";
+.index-search {
+    height: 100vh;
+    box-sizing: border-box;
+    padding-bottom: 200px;
+    .scroll-view-list {
+        height: calc(100vh - 284px);
+        .selector-item,
+        .recommend-item {
+            margin-top: 20px;
+        }
+        .at-card {
+            transition: background-color .2s;
+            &:active {
+                background-color: rgba(153, 153, 153, 0.2);
+            }
+        }
+        .at-card__header-extra {
+            color: red;
+        }
+    }
+    .footer-loading {
+        margin-top: 20px;
+        width: 100%;
+        height: 50px;
+        position: relative;
+    }
+    .pullDownBlock {
+        position: relative;
+        .tip {
+            position: absolute;
+            bottom: 30px;
+            text-align: center;
+            width: 100%;
+            color: #6190e8;
+            margin-bottom: -20px;
+        }
+    }
+    .selector-item-value {
+        height: 40px;
+    }
+}

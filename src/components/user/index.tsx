@@ -137,7 +137,14 @@ const User: React.FC<{}> = () => {
 
   return (
     <View className="index">
-      <View className={classnames("at-row", "user-avatar")}>
+      <View
+        className={classnames("at-row", "user-avatar")}
+        onClick={() => {
+          userInfo.userInfoFromDb.nickname && userInfo.accessToken
+            ? goToInfoEdit()
+            : login();
+        }}
+      >
         <View className={classnames("at-col", "avatar")}>
           <AtAvatar size={"large"} image={userInfo.userInfoFromDb.headimgurl} />
         </View>
@@ -153,22 +160,14 @@ const User: React.FC<{}> = () => {
             </Text>
           ) : (
             <View style={{ width: 48 }}>
-              <AtButton
-                onClick={() => login()}
-                type="secondary"
-                size="small"
-                circle
-              >
+              <AtButton type="secondary" size="small" circle>
                 登录
               </AtButton>
             </View>
           )}
         </View>
         {userInfo.userInfoFromDb.nickname && userInfo.accessToken && (
-          <View
-            className={classnames("at-icon", "at-icon-chevron-right")}
-            onClick={goToInfoEdit}
-          />
+          <View className={classnames("at-icon", "at-icon-chevron-right")} />
         )}
       </View>
       {userInfo.userInfoFromDb.nickname &&

@@ -68,11 +68,8 @@
         height: 100%;
         display: flex;
         flex-direction: column;
-        .at-search-bar__clear {
-            display: none !important;
-        }
         .scroll-container {
-            height: 500px;
+            height: 700px;
         }
         .school-list-item {
             text-align: center;

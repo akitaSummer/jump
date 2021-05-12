@@ -1,7 +1,6 @@
 import Taro from "@tarojs/taro";
 import { UserInfoEditType } from "../store";
-
-const userUrl = "https://doudou0.online/bg";
+import { userUrl } from "./";
 
 export const login = async (code: string) =>
   await Taro.request({

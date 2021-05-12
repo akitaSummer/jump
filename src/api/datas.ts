@@ -1,6 +1,6 @@
 import Taro from "@tarojs/taro";
 
-const userUrl = "https://doudou0.online/bg";
+import { userUrl } from "./";
 
 export const getSchoolList = async (name: string) =>
   await Taro.request({

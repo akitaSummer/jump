@@ -25,7 +25,8 @@ import {
   updateUser,
   uploadFile,
   getResumesList,
-  delResumes
+  delResumes,
+  userUrl
 } from "../../api";
 
 export const updateUserFile = (type: string, data?: UserFileType[]) => {
@@ -85,7 +86,16 @@ const updateUserInfoFromDb = (data?: UserInfoFromDbType) => {
   return data
     ? {
         type: UPDATE_USERINFOFROMDB,
-        data
+        data: {
+          ...data,
+          ...(data.sex === "0"
+            ? {
+                sex: "女"
+              }
+            : {
+                sex: "男"
+              })
+        }
       }
     : {
         type: USER_ERROR,

@@ -239,13 +239,13 @@ const InfoEdit = () => {
       >
         <View className={classNames("school-float")}>
           <AtSearchBar
-            actionName="清空"
+            actionName="搜索"
             value={schoolSearchValue}
             onChange={v => {
               setSchoolSearchValue(v);
             }}
             onActionClick={() => {
-              setSchoolSearchValue("");
+              setSchoolSearchValue(schoolSearchValue);
             }}
           />
           <ScrollView scrollY className={classNames("scroll-container")}>

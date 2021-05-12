@@ -1,6 +1,10 @@
 import { createStore, applyMiddleware, compose } from "redux";
 import thunkMiddleware from "redux-thunk";
-import rootReducer, { UserStateType, DatasStateType } from "./reducers";
+import rootReducer, {
+  UserStateType,
+  DatasStateType,
+  RecommendsStateType
+} from "./reducers";
 
 const composeEnhancers =
   typeof window === "object" &&
@@ -26,11 +30,12 @@ const enhancer = composeEnhancers(
   // other store enhancers if any
 );
 
-export { UserStateType, DatasStateType } from "./reducers";
+export { UserStateType, DatasStateType, RecommendsStateType } from "./reducers";
 
 export type StoreType = {
   user: UserStateType;
   datas: DatasStateType;
+  recommends: RecommendsStateType;
 };
 
 export * from "./reducers";
