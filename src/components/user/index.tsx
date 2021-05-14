@@ -182,11 +182,14 @@ const User: React.FC<{}> = () => {
               </Text>
               <View>
                 {item === "tips"
-                  ? userInfo.userInfoFromDb[item].split(",").map((item, i) => (
-                      <AtTag key={item + i} type="primary" circle active>
-                        {item}
-                      </AtTag>
-                    ))
+                  ? userInfo.userInfoFromDb[item]
+                      .split(",")
+                      .filter(item => item !== "")
+                      .map((item, i) => (
+                        <AtTag key={item + i} type="primary" circle active>
+                          {item}
+                        </AtTag>
+                      ))
                   : userInfo.userInfoFromDb[item]}
               </View>
             </View>

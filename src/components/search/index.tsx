@@ -11,7 +11,9 @@ import {
   RecommendsStateType,
   updateRecommendsList
 } from "../../store";
+import { filterDatas } from "../../utils";
 import { getRecommends } from "../../api";
+import FilterDropdown from "../filterDropdown";
 import "./index.scss";
 
 const blankList = [
@@ -42,6 +44,11 @@ const Search = () => {
   const [error, setError] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [isEmpty, setIsEmpty] = useState(false);
+  const [tags, setTags] = useState("");
+  const [filterDropdownValue, setFilterDropdownValue] = useState([
+    [[], []],
+    [[0]]
+  ]);
   const [searchValue, setSearchValue] = useState("");
   const [list, setList] = useState<RecommendType[]>([]);
   const recommends = useSelector<StoreType, RecommendsStateType>(
@@ -55,7 +62,7 @@ const Search = () => {
     dispatch(updateRecommendsList([]));
     const {
       data: { datas, pageNum, totalPages }
-    } = await getRecommends(1, 10, searchValue);
+    } = await getRecommends(1, 10, searchValue, tags);
     console.log(selector);
     if (selector) {
       setSelector(false);
@@ -68,7 +75,7 @@ const Search = () => {
   const getData = async (pIndex = pageIndex) => {
     const {
       data: { datas, pageNum, totalPages }
-    } = await getRecommends(pIndex, 10, searchValue);
+    } = await getRecommends(pIndex, 10, searchValue, tags);
     if (selector) {
       setSelector(false);
     }
@@ -93,6 +100,15 @@ const Search = () => {
     fn();
   };
 
+  const confirm = e => {
+    const tags = e.value
+      .flat(5)
+      .filter(item => item !== "")
+      .join(",");
+
+    setTags(tags);
+  };
+
   useEffect(() => {
     console.log(recommends.recommendsList.length);
     // @ts-ignore
@@ -108,11 +124,12 @@ const Search = () => {
 
   useEffect(() => {
     searchChange();
-  }, [searchValue]);
+  }, [searchValue, tags]);
 
   return (
     <View className={classNames("index-search")}>
       <AtSearchBar
+        className={"search-bar"}
         inputType="text"
         value={searchValue}
         onChange={v => {
@@ -123,6 +140,13 @@ const Search = () => {
           searchChange();
         }}
         actionName={"搜索"}
+      />
+      <FilterDropdown
+        filterData={filterDatas}
+        defaultSelected={filterDropdownValue}
+        updateMenuName={true}
+        confirm={confirm}
+        dataFormat="Object"
       />
       <ListView
         ref={refList}
@@ -143,7 +167,7 @@ const Search = () => {
         footerLoadingText={""}
       >
         {selector &&
-          recommends.recommendsList.length === 0 &&
+          recommends.recommendsList.length < 6 &&
           Array(9)
             .fill(1)
             .map(i => (
@@ -161,7 +185,7 @@ const Search = () => {
               </AtCard>
             ))}
         {selector &&
-          recommends.recommendsList.length !== 0 &&
+          recommends.recommendsList.length >= 0 &&
           recommends.recommendsList.slice(0, 9).map((item, index) => {
             return (
               <AtCard

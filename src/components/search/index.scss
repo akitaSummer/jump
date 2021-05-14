@@ -3,8 +3,11 @@
     height: 100vh;
     box-sizing: border-box;
     padding-bottom: 200px;
+    .search-bar {
+        z-index: 1000;
+    }
     .scroll-view-list {
-        height: calc(100vh - 284px);
+        height: calc(100vh - 364px);
         .selector-item,
         .recommend-item {
             margin-top: 20px;
