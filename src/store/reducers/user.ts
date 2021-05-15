@@ -80,6 +80,7 @@ export type UserStateType = {
   // 后台获取用户信息
   userInfoFromDb: UserInfoFromDbType;
   userFiles: UserFileType[];
+  userProductions: UserFileType[];
   hasUserInfoFromDb: Boolean;
   // 登录token
   accessToken: null | string;
@@ -124,6 +125,7 @@ export const INITIAL_STATE: UserStateType = {
     tips: ""
   },
   userFiles: [],
+  userProductions: [],
   hasUserInfoFromDb: false,
   // 登录token
   accessToken: Taro.getStorageSync("loginSessionKey"),
@@ -227,7 +229,8 @@ export default (state = INITIAL_STATE, actions) => {
     case DELETE_USERFILE:
       return {
         ...state,
-        userFiles: actions.data
+        userFiles: actions.data.filter(item => item.type === "resume"),
+        userProductions: actions.data.filter(item => item.type === "production")
       };
     case USER_ERROR:
       return {

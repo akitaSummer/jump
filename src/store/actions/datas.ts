@@ -1,5 +1,22 @@
-import { DATAS_CLEARTYPE, DATAS_ERROR, UPDATESCHOOLLIST } from "../constants";
+import {
+  DATAS_CLEARTYPE,
+  DATAS_ERROR,
+  UPDATESCHOOLLIST,
+  UPDATE_CURRENT_RECOMMEND
+} from "../constants";
+import { RecommendType } from "../reducers";
 import { getSchoolList } from "../../api";
+
+export const updateCurrentRecommend = (data?: RecommendType) => {
+  return data
+    ? {
+        type: UPDATE_CURRENT_RECOMMEND,
+        data
+      }
+    : {
+        type: UPDATE_CURRENT_RECOMMEND
+      };
+};
 
 export const updateSchoolList = (data?: string[]) => {
   return data

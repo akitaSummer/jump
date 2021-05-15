@@ -11,7 +11,7 @@ import {
   StoreType,
   UserStateType,
   asyncUpdateUserInfoFromDb,
-  asyncGetUserFiles
+  asyncGetFiles
 } from "../../store";
 
 import "./index.scss";
@@ -33,7 +33,7 @@ const Index = () => {
     try {
       if (!userInfo.accessToken) return;
       dispatch(asyncUpdateUserInfoFromDb(userInfo.accessToken));
-      dispatch(asyncGetUserFiles(userInfo.accessToken));
+      dispatch(asyncGetFiles(userInfo.accessToken));
     } catch (e) {
       console.log(e);
     }

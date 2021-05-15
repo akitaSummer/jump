@@ -32,7 +32,7 @@
     width: 100%;
     height: 88px;
     border-bottom: solid 1px #eee;
-    z-index: 12;
+    z-index: 900;
     background-color: #ffffff;
     flex-direction: row;
     .first-menu {
@@ -72,7 +72,7 @@
     transform: translate3d(0, - 100%, 0);
     max-height: 690px;
     background-color: #ffffff;
-    z-index: 11;
+    z-index: 899;
     box-shadow: 0 10px 10px rgba(0, 0, 0, .1);
     overflow: hidden;
     flex-direction: row;
@@ -308,7 +308,7 @@
 }
 
 .mask {
-    z-index: 10;
+    z-index: 890;
     position: fixed;
     top: 0;
     left: 0;

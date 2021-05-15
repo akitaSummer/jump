@@ -1,25 +1,26 @@
 import React, { useEffect, useState } from "react";
 import classnames from "classnames";
 import { View, Text } from "@tarojs/components";
-import Taro from "@tarojs/taro";
+import Taro, { Current } from "@tarojs/taro";
 import { AtButton, AtMessage } from "taro-ui";
 import { useSelector, useDispatch } from "react-redux";
 
 import {
   StoreType,
   UserStateType,
-  asyncUpdateUserFile,
-  asyncDelUserFile
+  asyncUpdateFile,
+  asyncDelFile
 } from "../../store";
-import { downloadResumes } from "../../api";
+import { downloadFile } from "../../api";
 
 import "./index.scss";
 import classNames from "classnames";
-import user from "../../store/reducers/user";
 
 const FileDetail = () => {
   const userInfo = useSelector<StoreType, UserStateType>(state => state.user);
   const dispatch = useDispatch();
+  const type = Current.router.params.type;
+  const typeName = type === "production" ? "作品集" : "简历";
 
   return (
     <View
@@ -32,43 +33,46 @@ const FileDetail = () => {
         <Text className={"tips"}>点击文件名即可预览</Text>
       </View>
       {userInfo.userInfoFromDb.nickname &&
-        userInfo.userFiles.map((item, i) => (
-          <View className={classnames("info_item")} key={item.name + item.id}>
-            <Text
-              className={classnames("item_name")}
-              onClick={async () => {
-                try {
-                  Taro.atMessage({
-                    message: "简历下载中",
-                    type: "warning"
-                  });
-                  // @ts-ignore
-                  const { tempFilePath } = await downloadResumes(
-                    userInfo.accessToken,
-                    item.path,
-                    item.name
-                  );
-                  Taro.atMessage({
-                    message: "简历下载完成",
-                    type: "success"
-                  });
-                  Taro.openDocument({
-                    filePath: tempFilePath
-                  });
-                } catch (e) {
-                  Taro.atMessage({
-                    message: "预览简历失败",
-                    type: "error"
-                  });
-                }
-              }}
-            >
-              {item.name}
-            </Text>
+        (type === "production"
+          ? userInfo.userProductions
+          : userInfo.userFiles
+        ).map((item, i) => (
+          <View
+            onClick={async () => {
+              try {
+                Taro.atMessage({
+                  message: `${typeName}下载中`,
+                  type: "warning"
+                });
+                // @ts-ignore
+                const { tempFilePath } = await downloadFile(
+                  userInfo.accessToken,
+                  item.path,
+                  item.name
+                );
+                Taro.atMessage({
+                  message: `${typeName}下载完成`,
+                  type: "success"
+                });
+                Taro.openDocument({
+                  filePath: tempFilePath
+                });
+              } catch (e) {
+                console.log(e);
+                Taro.atMessage({
+                  message: `预览${typeName}失败`,
+                  type: "error"
+                });
+              }
+            }}
+            className={classnames("info_item")}
+            key={item.name + item.id}
+          >
+            <Text className={classnames("item_name")}>{item.name}</Text>
             <View
               className={classnames("at-icon", "at-icon-close", "delete")}
               onClick={() => {
-                dispatch(asyncDelUserFile(userInfo.accessToken, item.id));
+                dispatch(asyncDelFile(userInfo.accessToken, item.id));
               }}
             />
           </View>
@@ -80,13 +84,14 @@ const FileDetail = () => {
       >
         <AtButton
           type="primary"
-          disabled={userInfo.userFiles.length >= 3}
+          disabled={
+            (type === "production"
+              ? userInfo.userProductions
+              : userInfo.userFiles
+            ).length >= 3
+          }
           className={classNames("submit-button")}
           onClick={() => {
-            Taro.atMessage({
-              message: "简历上传中",
-              type: "warning"
-            });
             Taro.chooseMessageFile({
               count: 1,
               extension: ["pdf", "word"],
@@ -94,24 +99,34 @@ const FileDetail = () => {
               success: data => {
                 const { tempFiles } = data;
                 const { name, path } = tempFiles[0];
+                Taro.atMessage({
+                  message: `${typeName}上传中,请稍等...`,
+                  type: "warning"
+                });
                 dispatch(
-                  asyncUpdateUserFile(
+                  asyncUpdateFile(
                     userInfo.accessToken,
-                    name.replace(" ", "_"),
-                    path
+                    name.replace(/(^\s+)|(\s+$)|\s+/g, "_"),
+                    path,
+                    type
                   )
                 );
               },
               fail: () => {
                 Taro.atMessage({
-                  message: "简历上传失败",
+                  message: `${typeName}上传失败`,
                   type: "error"
                 });
               }
             });
           }}
         >
-          {userInfo.userFiles.length >= 3 ? "简历最多只能上传3份" : "上传"}
+          {(type === "production"
+            ? userInfo.userProductions
+            : userInfo.userFiles
+          ).length >= 3
+            ? `${typeName}最多只能上传3份`
+            : "上传"}
         </AtButton>
       </View>
     </View>

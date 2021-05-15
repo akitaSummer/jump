@@ -25,11 +25,12 @@ import {
   updateUser,
   uploadFile,
   getResumesList,
-  delResumes,
+  delFile,
   userUrl
 } from "../../api";
 
 export const updateUserFile = (type: string, data?: UserFileType[]) => {
+  console.log(data);
   return data
     ? {
         type,
@@ -158,7 +159,7 @@ export const asyncSubmitUserInfoToDb = (
   }
 };
 
-export const asyncGetUserFiles = (access_token: string) => async dispatch => {
+export const asyncGetFiles = (access_token: string) => async dispatch => {
   try {
     const { data } = await getResumesList(access_token);
     dispatch(
@@ -168,7 +169,8 @@ export const asyncGetUserFiles = (access_token: string) => async dispatch => {
           return {
             id: item.id,
             path: item.path,
-            name: item.file_name
+            name: item.file_name,
+            type: item.type
           };
         })
       )
@@ -180,13 +182,14 @@ export const asyncGetUserFiles = (access_token: string) => async dispatch => {
   }
 };
 
-export const asyncUpdateUserFile = (
+export const asyncUpdateFile = (
   access_token: string,
   name: string,
-  path: string
+  path: string,
+  type: string
 ) => async dispatch => {
   try {
-    await uploadFile(access_token, name, path);
+    await uploadFile(access_token, name, path, type);
     const { data } = await getResumesList(access_token);
     dispatch(
       updateUserFile(
@@ -195,7 +198,8 @@ export const asyncUpdateUserFile = (
           return {
             id: item.id,
             path: item.path,
-            name: item.file_name
+            name: item.file_name,
+            type: item.type
           };
         })
       )
@@ -215,12 +219,12 @@ export const asyncUpdateUserFile = (
   }
 };
 
-export const asyncDelUserFile = (
+export const asyncDelFile = (
   access_token: string,
   id: number
 ) => async dispatch => {
   try {
-    await delResumes(access_token, id);
+    await delFile(access_token, id);
     const { data } = await getResumesList(access_token);
     Taro.atMessage({
       message: "删除简历成功",
@@ -233,7 +237,8 @@ export const asyncDelUserFile = (
           return {
             id: item.id,
             path: item.path,
-            name: item.file_name
+            name: item.file_name,
+            type: item.type
           };
         })
       )

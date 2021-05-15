@@ -32,7 +32,7 @@ export const updateUser = async (
     method: "PUT"
   });
 
-export const uploadFile = async (access_token: string, name: string, path) => {
+export const uploadFile = async (access_token: string, name: string, path: string, type: string) => {
   await Taro.uploadFile({
     url: `${userUrl}/files`,
     filePath: path,
@@ -41,7 +41,8 @@ export const uploadFile = async (access_token: string, name: string, path) => {
       AccessToken: access_token
     },
     formData: {
-      fileName: name
+      fileName: name,
+      type
     }
   });
 };
@@ -55,7 +56,7 @@ export const getResumesList = async (access_token: string) =>
     }
   });
 
-export const delResumes = async (access_token: string, id: number) =>
+export const delFile = async (access_token: string, id: number) =>
   await Taro.request({
     url: `${userUrl}/resumes/${id}`,
     method: "DELETE",
@@ -64,7 +65,7 @@ export const delResumes = async (access_token: string, id: number) =>
     }
   });
 
-export const downloadResumes = async (access_token: string, path, name) =>
+export const downloadFile = async (access_token: string, path, name) =>
   await Taro.downloadFile({
     url: `${userUrl}/files?path=${path}&filename=${name}`,
     header: {

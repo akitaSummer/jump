@@ -1,7 +1,7 @@
 @font-face {
     font-family: "iconfont";
     /* Project id  */
-    src: url('iconfont.ttf?t=1620954439073') format('truetype');
+    src: url('iconfont.ttf?t=1621074450035') format('truetype');
 }
 
 .iconfont {
@@ -58,6 +58,10 @@
 
 .icon-sex:before {
     content: "\e653";
+}
+
+.icon-zuopin:before {
+    content: "\e606";
 }
 
 .icon-city:before {

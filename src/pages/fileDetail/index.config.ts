@@ -1,3 +1,3 @@
 export default {
-  navigationBarTitleText: "简历列表"
+  navigationBarTitleText: "文件列表"
 };

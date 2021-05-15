@@ -2,7 +2,8 @@ import Taro from "@tarojs/taro";
 import {
   UPDATER_ECOMMENDS_LIST,
   RECOMMENDS_ERROR,
-  RECOMMENDS_CLEARTYPE
+  RECOMMENDS_CLEARTYPE,
+  UPDATE_CURRENT_RECOMMEND
 } from "../constants";
 
 export type RecommendType = {
@@ -41,6 +42,13 @@ export default (state = RECOMMENDS_INITIAL_STATE, actions) => {
         actionType: actions.type,
         recommendsList: actions.data
       };
+    case UPDATE_CURRENT_RECOMMEND: {
+      return {
+        ...state,
+        actionType: actions.type,
+        currentRecommend: actions.data
+      };
+    }
     case RECOMMENDS_ERROR:
       return {
         ...state,
@@ -52,6 +60,7 @@ export default (state = RECOMMENDS_INITIAL_STATE, actions) => {
         ...state,
         actionType: RECOMMENDS_CLEARTYPE
       };
+
     default:
       return {
         ...state,

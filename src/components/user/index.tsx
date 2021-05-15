@@ -13,7 +13,7 @@ import {
   UPDATE_USERINFOFROMDB,
   userClearType,
   USER_ERROR,
-  asyncGetUserFiles
+  asyncGetFiles
 } from "../../store";
 import { wxLogin, login as dbLogin } from "../../api";
 
@@ -86,7 +86,7 @@ const User: React.FC<{}> = () => {
       Taro.setStorageSync("loginSessionKey", access_token);
       dispatch(updateAccessToken(access_token));
       dispatch(asyncUpdateUserInfoFromDb(access_token));
-      dispatch(asyncGetUserFiles(access_token));
+      dispatch(asyncGetFiles(access_token));
     } catch (e) {
       console.log(e);
       setToastStatus(ToastStatus.Error);
@@ -196,20 +196,39 @@ const User: React.FC<{}> = () => {
           );
         })}
       {userInfo.userInfoFromDb.nickname && (
-        <View className={classnames("info_item")}>
+        <View
+          className={classnames("info_item")}
+          onClick={() => {
+            Taro.navigateTo({
+              url: "/pages/fileDetail/index?type=resume",
+              complete: () => {
+                dispatch(userClearType());
+              }
+            });
+          }}
+        >
           <View className={classnames("iconfont", "icon-filesearch")}></View>
           <Text className={classnames("item_name")}>简历</Text>
-          <View
-            className={classnames("value-right")}
-            onClick={() => {
-              Taro.navigateTo({
-                url: "/pages/fileDetail/index",
-                complete: () => {
-                  dispatch(userClearType());
-                }
-              });
-            }}
-          >
+          <View className={classnames("value-right")}>
+            <View className={classnames("at-icon", "at-icon-chevron-right")} />
+          </View>
+        </View>
+      )}
+      {userInfo.userInfoFromDb.nickname && (
+        <View
+          className={classnames("info_item")}
+          onClick={() => {
+            Taro.navigateTo({
+              url: "/pages/fileDetail/index?type=production",
+              complete: () => {
+                dispatch(userClearType());
+              }
+            });
+          }}
+        >
+          <View className={classnames("iconfont", "icon-zuopin")}></View>
+          <Text className={classnames("item_name")}>作品集</Text>
+          <View className={classnames("value-right")}>
             <View className={classnames("at-icon", "at-icon-chevron-right")} />
           </View>
         </View>

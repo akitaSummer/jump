@@ -9,7 +9,9 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   StoreType,
   RecommendsStateType,
-  updateRecommendsList
+  recommendsClearType,
+  updateRecommendsList,
+  updateCurrentRecommend
 } from "../../store";
 import { filterDatas } from "../../utils";
 import { getRecommends } from "../../api";
@@ -45,6 +47,7 @@ const Search = () => {
   const [hasMore, setHasMore] = useState(true);
   const [isEmpty, setIsEmpty] = useState(false);
   const [tags, setTags] = useState("");
+  const [citys, setCitys] = useState("");
   const [filterDropdownValue, setFilterDropdownValue] = useState([
     [[], []],
     [[0]]
@@ -62,7 +65,7 @@ const Search = () => {
     dispatch(updateRecommendsList([]));
     const {
       data: { datas, pageNum, totalPages }
-    } = await getRecommends(1, 10, searchValue, tags);
+    } = await getRecommends(1, 10, searchValue, tags, citys);
     console.log(selector);
     if (selector) {
       setSelector(false);
@@ -75,7 +78,7 @@ const Search = () => {
   const getData = async (pIndex = pageIndex) => {
     const {
       data: { datas, pageNum, totalPages }
-    } = await getRecommends(pIndex, 10, searchValue, tags);
+    } = await getRecommends(pIndex, 10, searchValue, tags, citys);
     if (selector) {
       setSelector(false);
     }
@@ -101,12 +104,18 @@ const Search = () => {
   };
 
   const confirm = e => {
-    const tags = e.value
+    console.log(e.value);
+    const tags = e.value[0]
+      .flat(5)
+      .filter(item => item !== "")
+      .join(",");
+    const citys = e.value[1]
       .flat(5)
       .filter(item => item !== "")
       .join(",");
 
     setTags(tags);
+    setCitys(citys);
   };
 
   useEffect(() => {
@@ -124,7 +133,7 @@ const Search = () => {
 
   useEffect(() => {
     searchChange();
-  }, [searchValue, tags]);
+  }, [searchValue, tags, citys]);
 
   return (
     <View className={classNames("index-search")}>
@@ -209,6 +218,15 @@ const Search = () => {
               note={`公司：${item.origin}; 工作地点：${item.workPlace}`}
               extra={item.reqWorkYearsName}
               title={item.name}
+              onClick={() => {
+                dispatch(updateCurrentRecommend(item));
+                Taro.navigateTo({
+                  url: "/pages/recommendDetail/index",
+                  complete: () => {
+                    dispatch(recommendsClearType());
+                  }
+                });
+              }}
               // thumb=""
             >
               <View className="itemtitle">{item.depFullName}</View>
