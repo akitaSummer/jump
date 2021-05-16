@@ -34,48 +34,52 @@ export const filterDatas = [
   //   ]
   // },
   {
-    name: "职位",
+    name: "工作年限",
     type: "filter",
     submenu: [
       {
-        name: "开发",
         submenu: [
           {
-            name: "Java",
-            value: "Java"
+            name: "实习",
+            value: "实习"
           },
           {
-            name: "js",
-            value: "js"
+            name: "1-3年",
+            value: "1-3年"
           },
           {
-            name: "golang",
-            value: "golang"
+            name: "3-5年",
+            value: "3-5年"
+          },
+          {
+            name: "5-10年",
+            value: "5-10年"
           }
         ]
-      },
+      }
+    ]
+  },
+  {
+    name: "学历",
+    type: "filter",
+    submenu: [
       {
-        name: "其他",
         submenu: [
           {
-            name: "rust",
-            value: "rust"
+            name: "大专",
+            value: "大专"
           },
           {
-            name: "c++",
-            value: "c++"
+            name: "本科",
+            value: "本科"
           },
           {
-            name: "产品",
-            value: "产品"
+            name: "硕士",
+            value: "硕士"
           },
           {
-            name: "运维",
-            value: "运维"
-          },
-          {
-            name: "hr",
-            value: "hr"
+            name: "博士",
+            value: "博士"
           }
         ]
       }
@@ -87,10 +91,6 @@ export const filterDatas = [
     submenu: [
       {
         submenu: [
-          {
-            name: "不限",
-            value: ""
-          },
           {
             name: "杭州市",
             value: "杭州市"

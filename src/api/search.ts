@@ -5,7 +5,8 @@ export const getRecommends = async (
   pageNum: number,
   pageSize: number,
   searchVal: string,
-  tags?: string,
+  years?: string,
+  education?: string,
   city?: string
 ) =>
   await Taro.request({
@@ -14,9 +15,14 @@ export const getRecommends = async (
       pageNum,
       pageSize,
       searchVal,
-      ...(tags
+      ...(years
         ? {
-            tags
+            years
+          }
+        : {}),
+      ...(education
+        ? {
+            education
           }
         : {}),
       ...(city

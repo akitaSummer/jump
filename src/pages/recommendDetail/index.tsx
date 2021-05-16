@@ -18,7 +18,6 @@ import {
 } from "../../store";
 import { wxLogin, login as dbLogin } from "../../api";
 
-import "./index.scss";
 import classNames from "classnames";
 
 enum ToastStatus {
@@ -63,7 +62,6 @@ const RecommendDetail = () => {
       const {
         data: { access_token }
       } = await dbLogin(wxRes.code);
-      console.log(access_token);
       Taro.setStorageSync("loginSessionKey", access_token);
       dispatch(updateAccessToken(access_token));
       dispatch(asyncUpdateUserInfoFromDb(access_token));
@@ -100,8 +98,6 @@ const RecommendDetail = () => {
       }, 500);
     }
   }, [toastStatus]);
-
-  console.log(userInfo.userInfoFromDb);
 
   return (
     <View

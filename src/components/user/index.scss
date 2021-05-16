@@ -43,7 +43,7 @@
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     margin: 0;
     padding-left: 64px;
-    height: 116px;
+    min-height: 116px;
     display: flex;
     align-items: center;
     transition: background-color .2s;
@@ -58,7 +58,7 @@
         width: 144px;
     }
     .at-tag--active {
-        margin-right: 24px;
+        margin: 12px 24px 12px 0;
         &:nth-child(2) {
             background-color: $my-pick;
             border-color: $my-pick;

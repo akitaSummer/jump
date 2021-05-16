@@ -11,10 +11,11 @@ import {
   StoreType,
   UserStateType,
   asyncUpdateUserInfoFromDb,
-  asyncGetFiles
+  asyncGetFiles,
+  asyncGetHistoryList,
+  asyncUpdateCitysList,
+  asyncUpdateTagsList
 } from "../../store";
-
-import "./index.scss";
 
 const ComponentMaps = {
   0: History,
@@ -31,9 +32,12 @@ const Index = () => {
 
   const getUserMessage = () => {
     try {
+      dispatch(asyncUpdateCitysList());
+      dispatch(asyncUpdateTagsList());
       if (!userInfo.accessToken) return;
       dispatch(asyncUpdateUserInfoFromDb(userInfo.accessToken));
       dispatch(asyncGetFiles(userInfo.accessToken));
+      dispatch(asyncGetHistoryList(userInfo.accessToken));
     } catch (e) {
       console.log(e);
     }
@@ -49,9 +53,12 @@ const Index = () => {
       <AtTabBar
         fixed
         tabList={[
-          { title: "进度查询", iconType: "bullet-list", text: "new" },
+          // { title: "进度查询", iconType: "bullet-list", text: "new" },
+          // { title: "内推岗位", iconType: "search" },
+          // { title: "我的", iconType: "user", text: "100", max: 99 }
+          { title: "进度查询", iconType: "bullet-list" },
           { title: "内推岗位", iconType: "search" },
-          { title: "我的", iconType: "user", text: "100", max: 99 }
+          { title: "我的", iconType: "user" }
         ]}
         onClick={number => {
           setCurrent(number);

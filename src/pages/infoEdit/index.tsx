@@ -32,7 +32,6 @@ import {
 } from "../../store";
 import { degreeList } from "../../utils";
 
-import "./index.scss";
 import classNames from "classnames";
 
 const InfoEdit = () => {
@@ -206,7 +205,7 @@ const InfoEdit = () => {
                 </AtTag>
               ))
             ) : (
-              <Text>"请选择您的意向岗位，最多三个"</Text>
+              <Text className={"item-empty"}>请选择您的意向岗位，最多三个</Text>
             )}
           </View>
         </View>

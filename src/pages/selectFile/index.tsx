@@ -9,11 +9,11 @@ import {
   StoreType,
   UserStateType,
   UserFileType,
-  RecommendsStateType
+  RecommendsStateType,
+  userClearType
 } from "../../store";
 import { downloadFile, recommendsUrl, resumePost } from "../../api";
 
-import "./index.scss";
 import classNames from "classnames";
 
 enum ToastStatus {
@@ -112,6 +112,20 @@ const SelectFile = () => {
               </View>
             </View>
           ))}
+        <AtButton
+          className={classNames("upload-production")}
+          type="primary"
+          onClick={() => {
+            Taro.navigateTo({
+              url: "/pages/fileDetail/index?type=resume",
+              complete: () => {
+                dispatch(userClearType());
+              }
+            });
+          }}
+        >
+          上传简历
+        </AtButton>
       </AtAccordion>
 
       <AtAccordion
@@ -166,6 +180,20 @@ const SelectFile = () => {
               </View>
             </View>
           ))}
+        <AtButton
+          className={classNames("upload-production")}
+          type="primary"
+          onClick={() => {
+            Taro.navigateTo({
+              url: "/pages/fileDetail/index?type=production",
+              complete: () => {
+                dispatch(userClearType());
+              }
+            });
+          }}
+        >
+          上传作品集
+        </AtButton>
       </AtAccordion>
 
       <View

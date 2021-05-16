@@ -82,7 +82,6 @@ const User: React.FC<{}> = () => {
       const {
         data: { access_token }
       } = await dbLogin(wxRes.code);
-      console.log(access_token);
       Taro.setStorageSync("loginSessionKey", access_token);
       dispatch(updateAccessToken(access_token));
       dispatch(asyncUpdateUserInfoFromDb(access_token));

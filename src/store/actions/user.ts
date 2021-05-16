@@ -30,7 +30,6 @@ import {
 } from "../../api";
 
 export const updateUserFile = (type: string, data?: UserFileType[]) => {
-  console.log(data);
   return data
     ? {
         type,
@@ -138,6 +137,11 @@ export const asyncUpdateUserInfoFromDb = (
 ) => async dispatch => {
   try {
     const { data } = await getUserInfo(access_token);
+    Object.keys(data).forEach(key => {
+      if (data[key] === null) {
+        data[key] = "";
+      }
+    });
     dispatch(updateUserInfoFromDb(data));
   } catch (e) {
     dispatch(updateUserInfoFromDb());

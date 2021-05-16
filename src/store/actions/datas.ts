@@ -2,21 +2,11 @@ import {
   DATAS_CLEARTYPE,
   DATAS_ERROR,
   UPDATESCHOOLLIST,
-  UPDATE_CURRENT_RECOMMEND
+  UPDATE_CITYS_LIST,
+  UPDATE_TAGS_LIST
 } from "../constants";
-import { RecommendType } from "../reducers";
-import { getSchoolList } from "../../api";
-
-export const updateCurrentRecommend = (data?: RecommendType) => {
-  return data
-    ? {
-        type: UPDATE_CURRENT_RECOMMEND,
-        data
-      }
-    : {
-        type: UPDATE_CURRENT_RECOMMEND
-      };
-};
+import { TagType } from "../reducers";
+import { getSchoolList, getCitysList, getTags } from "../../api";
 
 export const updateSchoolList = (data?: string[]) => {
   return data
@@ -30,6 +20,30 @@ export const updateSchoolList = (data?: string[]) => {
       };
 };
 
+export const updateCitysList = (data?: string[]) => {
+  return data
+    ? {
+        type: UPDATE_CITYS_LIST,
+        data
+      }
+    : {
+        type: DATAS_ERROR,
+        data: UPDATE_CITYS_LIST
+      };
+};
+
+export const updateTagsList = (data?: TagType[]) => {
+  return data
+    ? {
+        type: UPDATE_TAGS_LIST,
+        data
+      }
+    : {
+        type: DATAS_ERROR,
+        data: UPDATE_TAGS_LIST
+      };
+};
+
 export const datasClearType = () => {
   return {
     type: DATAS_CLEARTYPE
@@ -39,10 +53,33 @@ export const datasClearType = () => {
 export const asyncUpdateSchoolList = (name: string) => async dispatch => {
   try {
     const { data } = await getSchoolList(name);
-    console.log(data);
     dispatch(updateSchoolList(data.map(item => item.name)));
   } catch (e) {
     dispatch(updateSchoolList());
+    console.log(e);
+    throw e;
+  }
+};
+
+export const asyncUpdateCitysList = () => async dispatch => {
+  try {
+    const { data } = await getCitysList();
+    console.log;
+    dispatch(updateCitysList(data));
+  } catch (e) {
+    dispatch(updateCitysList());
+    console.log(e);
+    throw e;
+  }
+};
+
+export const asyncUpdateTagsList = () => async dispatch => {
+  try {
+    const { data } = await getTags();
+    console.log;
+    dispatch(updateTagsList(data));
+  } catch (e) {
+    dispatch(updateTagsList());
     console.log(e);
     throw e;
   }

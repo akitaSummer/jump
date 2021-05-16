@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import Taro from "@tarojs/taro";
 import { View, Image } from "@tarojs/components";
 import { AtCard, AtActivityIndicator, AtSearchBar } from "taro-ui";
@@ -8,12 +8,14 @@ import { useSelector, useDispatch } from "react-redux";
 
 import {
   StoreType,
+  DatasStateType,
   RecommendsStateType,
   recommendsClearType,
   updateRecommendsList,
-  updateCurrentRecommend
+  updateCurrentRecommend,
+  asyncUpdateCitysList
 } from "../../store";
-import { filterDatas } from "../../utils";
+import { filterDatas as filterDefaultDatas } from "../../utils";
 import { getRecommends } from "../../api";
 import FilterDropdown from "../filterDropdown";
 import "./index.scss";
@@ -46,54 +48,76 @@ const Search = () => {
   const [error, setError] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [isEmpty, setIsEmpty] = useState(false);
-  const [tags, setTags] = useState("");
+  const [years, setYears] = useState("");
+  const [education, setEducation] = useState("");
   const [citys, setCitys] = useState("");
   const [filterDropdownValue, setFilterDropdownValue] = useState([
-    [[], []],
-    [[0]]
+    [[]],
+    [[]],
+    [[]]
   ]);
   const [searchValue, setSearchValue] = useState("");
   const [list, setList] = useState<RecommendType[]>([]);
+  const datas = useSelector<StoreType, DatasStateType>(state => state.datas);
   const recommends = useSelector<StoreType, RecommendsStateType>(
     state => state.recommends
   );
+  const filterDatas = useMemo(() => {
+    const data = [...filterDefaultDatas];
+    data[2] = {
+      name: "城市",
+      type: "radio",
+      submenu: [
+        {
+          submenu: datas.citysList.map(item => {
+            return {
+              name: item,
+              value: item
+            };
+          })
+        }
+      ]
+    };
+    return data;
+  }, [datas.citysList]);
   const dispatch = useDispatch();
   const refList = useRef(null);
-
   const searchChange = async () => {
     if (isFrist) return;
     dispatch(updateRecommendsList([]));
     const {
       data: { datas, pageNum, totalPages }
-    } = await getRecommends(1, 10, searchValue, tags, citys);
-    console.log(selector);
+    } = await getRecommends(1, 10, searchValue, years, education, citys);
     if (selector) {
       setSelector(false);
     }
     setList([...datas]);
     dispatch(updateRecommendsList([...datas]));
     setHasMore(pageNum < totalPages);
+    setIsEmpty(datas.length === 0);
   };
 
   const getData = async (pIndex = pageIndex) => {
     const {
       data: { datas, pageNum, totalPages }
-    } = await getRecommends(pIndex, 10, searchValue, tags, citys);
+    } = await getRecommends(pIndex, 10, searchValue, years, education, citys);
     if (selector) {
       setSelector(false);
     }
     return {
       list: datas,
-      hasMore: pageNum < totalPages
+      hasMore: pageNum < totalPages,
+      isEmpty: datas.length === 0
     };
   };
 
   const pullDownRefresh = async () => {
     pageIndex = 1;
-    const { list, hasMore } = await getData(1);
+    const { list, hasMore, isEmpty } = await getData(1);
     setList([...list]);
     dispatch(updateRecommendsList([...list]));
     setHasMore(hasMore);
+    setIsEmpty(isEmpty);
   };
 
   const onScrollToLower = async fn => {
@@ -104,22 +128,25 @@ const Search = () => {
   };
 
   const confirm = e => {
-    console.log(e.value);
-    const tags = e.value[0]
+    const years = e.value[0]
       .flat(5)
       .filter(item => item !== "")
       .join(",");
-    const citys = e.value[1]
+    const education = e.value[1]
+      .flat(5)
+      .filter(item => item !== "")
+      .join(",");
+    const citys = e.value[2]
       .flat(5)
       .filter(item => item !== "")
       .join(",");
 
-    setTags(tags);
+    setYears(years);
+    setEducation(education);
     setCitys(citys);
   };
 
   useEffect(() => {
-    console.log(recommends.recommendsList.length);
     // @ts-ignore
     refList.current.fetchInit();
     setIsFirst(false);
@@ -133,7 +160,7 @@ const Search = () => {
 
   useEffect(() => {
     searchChange();
-  }, [searchValue, tags, citys]);
+  }, [searchValue, education, citys, years]);
 
   return (
     <View className={classNames("index-search")}>

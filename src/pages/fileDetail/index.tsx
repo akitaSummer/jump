@@ -13,7 +13,6 @@ import {
 } from "../../store";
 import { downloadFile } from "../../api";
 
-import "./index.scss";
 import classNames from "classnames";
 
 const FileDetail = () => {

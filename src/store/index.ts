@@ -3,7 +3,8 @@ import thunkMiddleware from "redux-thunk";
 import rootReducer, {
   UserStateType,
   DatasStateType,
-  RecommendsStateType
+  RecommendsStateType,
+  HistoryStateType
 } from "./reducers";
 
 const composeEnhancers =
@@ -30,12 +31,18 @@ const enhancer = composeEnhancers(
   // other store enhancers if any
 );
 
-export { UserStateType, DatasStateType, RecommendsStateType } from "./reducers";
+export {
+  UserStateType,
+  DatasStateType,
+  RecommendsStateType,
+  HistoryStateType
+} from "./reducers";
 
 export type StoreType = {
   user: UserStateType;
   datas: DatasStateType;
   recommends: RecommendsStateType;
+  history: HistoryStateType;
 };
 
 export * from "./reducers";
