@@ -38,18 +38,18 @@ const LoaingStatus = {
 enum ScheduleStatus {
   NOT_APPLY = "not_apply",
   POSTED = "posted",
-  WAIT_CHECK = "wait_check",
+  WAIT_CHECK = "wait",
   CHECKING = "checking",
   WRITTEN_EXAM = "written_exam",
   TESTING = "testing",
   OFFERED = "offered",
   HIRED = "hired",
   HR_FAILED = "hr_fail",
-  CHECK_FAILED = "check_failed",
-  TEST_FAILED = "test_failed",
+  CHECK_FAILED = "check_fail",
+  TEST_FAILED = "test_fail",
   WAIT_OFFER = "wait_offer",
-  OFFER_FAILED = "offer_failed",
-  OFFER_SUCCESS = "offer_success",
+  OFFER_FAILED = "offer_deny",
+  OFFER_SUCCESS = "offer_ok",
   IN_OTHER_PROGRESS = "in_other"
 }
 
@@ -128,7 +128,7 @@ const ScheduleStatusMap = {
   [ScheduleStatus.WAIT_OFFER]: "offer沟通中",
   [ScheduleStatus.OFFER_FAILED]: "拒绝offer",
   [ScheduleStatus.OFFER_SUCCESS]: "接受offer",
-  [ScheduleStatus.IN_OTHER_PROGRESS]: "在别的流程中，或已接受offer"
+  [ScheduleStatus.IN_OTHER_PROGRESS]: "冷冻期未过,或已投过该职位,请投其他职位"
 };
 
 type StepType = {
@@ -142,6 +142,7 @@ const getStepsList = (type: ScheduleStatus) => {
     items: StepType[];
     current: number;
   };
+
   if (StepOnePadding.includes(type)) {
     result = {
       items: [
@@ -267,7 +268,7 @@ const getStepsList = (type: ScheduleStatus) => {
       current: 2
     };
   }
-
+  console.log(type);
   return (
     <AtSteps
       items={result.items}
@@ -289,6 +290,7 @@ type HistoryFilterDataType = {
 };
 
 const History: React.FC = props => {
+  const [isFrist, setIsFirst] = useState(true);
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMask, setToastMask] = useState(false);
   const [toastStatus, setToastStatus] = useState<ToastStatus>(
@@ -297,27 +299,12 @@ const History: React.FC = props => {
   const [isEmpty, setIsEmpty] = useState(false);
   const [error, setError] = useState(false);
   const [hasMore, setHasMore] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
   const [searchValue, setSearchValue] = useState("");
   const [filterCompany, setFilterCompany] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
-  const [filterDropdownValue, setFilterDropdownValue] = useState([
-    [[null]],
-    [[null]]
-  ]);
-  const [steps, setSteps] = useState<StepType[]>([
-    {
-      title: "未投递",
-      desc: ""
-    },
-    {
-      title: "未面试",
-      desc: ""
-    },
-    {
-      title: "暂未获得offer",
-      desc: ""
-    }
+  const [filterDropdownValue, setFilterDropdownValue] = useState<any>([
+    [[]],
+    [[]]
   ]);
 
   const history = useSelector<StoreType, HistoryStateType>(
@@ -414,6 +401,21 @@ const History: React.FC = props => {
         disableStatus.includes(item.status as ScheduleStatus)
       )
     );
+    const newFilterDatas = [[], []];
+    const firstFilter = filterDatas[0].submenu[0].submenu
+      .map(item => item.value)
+      .indexOf(filterCompany);
+    const secFilter = filterDatas[1].submenu[0].submenu
+      .map(item => item.value)
+      .indexOf(filterStatus);
+    if (firstFilter >= 0) {
+      newFilterDatas[0] = [[firstFilter]];
+    }
+    if (secFilter >= 0) {
+      newFilterDatas[1] = [[secFilter]];
+    }
+    console.log(newFilterDatas);
+    setFilterDropdownValue(newFilterDatas);
     dispatch(updateHistoryList([...list]));
     setIsEmpty(isEmpty);
   };
@@ -446,6 +448,7 @@ const History: React.FC = props => {
   };
 
   useEffect(() => {
+    if (isFrist) return;
     searchChange();
   }, [searchValue, filterCompany, filterStatus]);
 
@@ -479,8 +482,9 @@ const History: React.FC = props => {
     Taro.setNavigationBarTitle({
       title: "进度查询"
     });
+    setIsFirst(false);
     // @ts-ignore
-    if (userInfo.accessToken) refList.current.fetchInit();
+    // if (userInfo.accessToken) refList.current.fetchInit();
   }, []);
 
   return (

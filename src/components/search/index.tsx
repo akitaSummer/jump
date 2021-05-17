@@ -148,7 +148,6 @@ const Search = () => {
 
   useEffect(() => {
     // @ts-ignore
-    refList.current.fetchInit();
     setIsFirst(false);
   }, []);
 

@@ -76,7 +76,13 @@ const InfoEdit = () => {
 
   useEffect(() => {
     dispatch(updateSchoolList([]));
-    if (userInfo.actionType !== UPDATE_USERINFOEDITTIPS) reset();
+    if (userInfo.actionType !== UPDATE_USERINFOEDITTIPS) {
+      reset();
+    }
+    return () => {
+      console.log(1);
+      dispatch(userClearType());
+    };
   }, []);
 
   useEffect(() => {

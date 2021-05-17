@@ -8,9 +8,10 @@ import {
   StoreType,
   UserStateType,
   updateUserInfoEditTips,
-  DatasStateType
+  DatasStateType,
+  UPDATE_USERINFOEDITTIPS,
+  userClearType
 } from "../../store";
-import { tipsList } from "../../utils";
 
 import classNames from "classnames";
 
@@ -48,15 +49,6 @@ const TipsChoose = () => {
   };
 
   useEffect(() => {
-    setSaveClick(false);
-    return () => {
-      if (!saveClick) {
-        dispatch(updateUserInfoEditTips(userInfo.userInfoEdit.tips));
-      }
-    };
-  }, []);
-
-  useEffect(() => {
     if (saveClick) {
       Taro.navigateBack({
         complete: () => {
@@ -66,6 +58,11 @@ const TipsChoose = () => {
         }
       });
     }
+    return () => {
+      if (!saveClick) {
+        dispatch(updateUserInfoEditTips(userInfo.userInfoEdit.tips));
+      }
+    };
   }, [saveClick]);
 
   return (
