@@ -50,7 +50,7 @@ export type UserInfoFromDbType = {
   openid: string;
   phone: string;
   school: string;
-  sex: "1" | "0";
+  sex: 1 | 0;
   status: string;
   tips: string;
 };
@@ -120,9 +120,9 @@ export const INITIAL_STATE: UserStateType = {
     openid: "",
     phone: "",
     school: "",
-    sex: "1",
+    sex: 1,
     status: "",
-    tips: ""
+    tips: Taro.getStorageSync("tips") || ""
   },
   userFiles: [],
   userProductions: [],

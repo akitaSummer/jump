@@ -311,6 +311,7 @@ const History: React.FC = props => {
     state => state.history
   );
   const userInfo = useSelector<StoreType, UserStateType>(state => state.user);
+
   const dispatch = useDispatch();
   const filterDatas = useMemo(
     () => [
@@ -320,7 +321,9 @@ const History: React.FC = props => {
         submenu: [
           {
             submenu: [
-              ...new Set(history.historyList.map(item => item.company))
+              ...(Array.isArray(history.historyList)
+                ? new Set(history.historyList.map(item => item.company))
+                : [])
             ].map(item => {
               return {
                 name: item,
@@ -352,14 +355,18 @@ const History: React.FC = props => {
     [history.historyList]
   );
   const [paddingList, setPaddingList] = useState<SchedulesType[]>(
-    history.historyList.filter(
-      item => !disableStatus.includes(item.status as ScheduleStatus)
-    )
+    Array.isArray(history.historyList)
+      ? history.historyList.filter(
+          item => !disableStatus.includes(item.status as ScheduleStatus)
+        )
+      : []
   );
   const [failedList, setFailedList] = useState<SchedulesType[]>(
-    history.historyList.filter(item =>
-      disableStatus.includes(item.status as ScheduleStatus)
-    )
+    Array.isArray(history.historyList)
+      ? history.historyList.filter(item =>
+          disableStatus.includes(item.status as ScheduleStatus)
+        )
+      : []
   );
   const refList = useRef(null);
 
@@ -508,7 +515,7 @@ const History: React.FC = props => {
         confirm={confirm}
         dataFormat="Object"
       />
-      {userInfo.accessToken ? (
+      {userInfo.userInfoFromDb.nickname && userInfo.accessToken ? (
         <ListView
           ref={refList}
           isError={error}

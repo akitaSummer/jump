@@ -88,7 +88,7 @@ const updateUserInfoFromDb = (data?: UserInfoFromDbType) => {
         type: UPDATE_USERINFOFROMDB,
         data: {
           ...data,
-          ...(data.sex === "0"
+          ...(data.sex === 0
             ? {
                 sex: "女"
               }
@@ -111,6 +111,7 @@ export const updateAccessToken = (data: string) => {
 };
 
 export const submitUserInfoToDb = (data?: UserInfoEditType) => {
+  data && Taro.setStorageSync("tips", data.tips);
   return data
     ? {
         type: SUBMITUSERINFOTODB,
@@ -124,7 +125,8 @@ export const submitUserInfoToDb = (data?: UserInfoEditType) => {
 
 export const asyncUpdateUserProfile = () => async dispatch => {
   try {
-    const { authSetting } = await getSetting();
+    const { authSetting, errMsg } = await getSetting();
+    console.log(errMsg);
     dispatch(updateUserProfile(authSetting));
   } catch (e) {
     dispatch(updateUserProfile());
@@ -136,7 +138,10 @@ export const asyncUpdateUserInfoFromDb = (
   access_token: string
 ) => async dispatch => {
   try {
-    const { data } = await getUserInfo(access_token);
+    const { data, statusCode, errMsg } = await getUserInfo(access_token);
+    if (statusCode < 200 || statusCode >= 300) {
+      throw new Error(errMsg);
+    }
     Object.keys(data).forEach(key => {
       if (data[key] === null) {
         data[key] = "";
@@ -154,7 +159,15 @@ export const asyncSubmitUserInfoToDb = (
   info: UserInfoEditType
 ) => async dispatch => {
   try {
-    await updateUser(access_token, info);
+    const { statusCode, errMsg } = await updateUser(access_token, info);
+    if (statusCode < 200 || statusCode >= 300) {
+      if (statusCode === 403)
+        Taro.atMessage({
+          message: "个人信息只能三个月修改三次！",
+          type: "error"
+        });
+      throw new Error(errMsg);
+    }
     dispatch(submitUserInfoToDb(info));
   } catch (e) {
     dispatch(submitUserInfoToDb());
@@ -165,7 +178,11 @@ export const asyncSubmitUserInfoToDb = (
 
 export const asyncGetFiles = (access_token: string) => async dispatch => {
   try {
-    const { data } = await getResumesList(access_token);
+    const { data, statusCode, errMsg } = await getResumesList(access_token);
+    if (statusCode < 200 || statusCode >= 300) {
+      throw new Error(errMsg);
+    }
+    if (!Array.isArray(data)) throw new Error("data is not array");
     dispatch(
       updateUserFile(
         GET_USERFILES,
@@ -194,7 +211,15 @@ export const asyncUpdateFile = (
 ) => async dispatch => {
   try {
     await uploadFile(access_token, name, path, type);
-    const { data } = await getResumesList(access_token);
+    const {
+      data,
+      statusCode: listStatusCode,
+      errMsg: listStatusErrMsg
+    } = await getResumesList(access_token);
+    if (listStatusCode < 200 || listStatusCode >= 300) {
+      throw new Error(listStatusErrMsg);
+    }
+    if (!Array.isArray(data)) throw new Error("data is not array");
     dispatch(
       updateUserFile(
         UPDATE_USERFILE,
@@ -228,12 +253,23 @@ export const asyncDelFile = (
   id: number
 ) => async dispatch => {
   try {
-    await delFile(access_token, id);
-    const { data } = await getResumesList(access_token);
+    const { statusCode, errMsg } = await delFile(access_token, id);
+    if (statusCode < 200 || statusCode >= 300) {
+      throw new Error(errMsg);
+    }
+    const {
+      data,
+      statusCode: listStatusCode,
+      errMsg: listStatusErrMsg
+    } = await getResumesList(access_token);
+    if (listStatusCode < 200 || listStatusCode >= 300) {
+      throw new Error(listStatusErrMsg);
+    }
     Taro.atMessage({
       message: "删除简历成功",
       type: "success"
     });
+    if (!Array.isArray(data)) throw new Error("data is not array");
     dispatch(
       updateUserFile(
         DELETE_USERFILE,

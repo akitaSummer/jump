@@ -10,7 +10,17 @@ export const tipsList = [
   }
 ];
 
-export const filterDatas = [
+export const filterDatas: {
+  name: string;
+  type: string;
+  submenu: {
+    name?: string;
+    submenu: {
+      name: string;
+      value: string;
+    }[];
+  }[];
+}[] = [
   // {
   //   // name:'智能排序',
   //   type: "hierarchy",

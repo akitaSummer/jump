@@ -52,7 +52,10 @@ export const datasClearType = () => {
 
 export const asyncUpdateSchoolList = (name: string) => async dispatch => {
   try {
-    const { data } = await getSchoolList(name);
+    const { data, statusCode, errMsg } = await getSchoolList(name);
+    if (statusCode < 200 || statusCode >= 300) {
+      throw new Error(errMsg);
+    }
     dispatch(updateSchoolList(data.map(item => item.name)));
   } catch (e) {
     dispatch(updateSchoolList());
@@ -63,8 +66,10 @@ export const asyncUpdateSchoolList = (name: string) => async dispatch => {
 
 export const asyncUpdateCitysList = () => async dispatch => {
   try {
-    const { data } = await getCitysList();
-    console.log;
+    const { data, statusCode, errMsg } = await getCitysList();
+    if (statusCode < 200 || statusCode >= 300) {
+      throw new Error(errMsg);
+    }
     dispatch(updateCitysList(data));
   } catch (e) {
     dispatch(updateCitysList());
@@ -75,8 +80,10 @@ export const asyncUpdateCitysList = () => async dispatch => {
 
 export const asyncUpdateTagsList = () => async dispatch => {
   try {
-    const { data } = await getTags();
-    console.log;
+    const { data, statusCode, errMsg } = await getTags();
+    if (statusCode < 200 || statusCode >= 300) {
+      throw new Error(errMsg);
+    }
     dispatch(updateTagsList(data));
   } catch (e) {
     dispatch(updateTagsList());

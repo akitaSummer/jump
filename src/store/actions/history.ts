@@ -40,7 +40,10 @@ export const historyClearType = () => {
 
 export const asyncGetHistoryList = (access_token: string) => async dispatch => {
   try {
-    const { data } = await getHistoryList(access_token);
+    const { data, statusCode, errMsg } = await getHistoryList(access_token);
+    if (statusCode < 200 || statusCode >= 300) {
+      throw new Error(errMsg);
+    }
     dispatch(updateHistoryList(data));
   } catch (e) {
     dispatch(updateHistoryList());

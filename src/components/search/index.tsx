@@ -13,7 +13,7 @@ import {
   recommendsClearType,
   updateRecommendsList,
   updateCurrentRecommend,
-  asyncUpdateCitysList
+  UserStateType
 } from "../../store";
 import { filterDatas as filterDefaultDatas } from "../../utils";
 import { getRecommends } from "../../api";
@@ -62,20 +62,24 @@ const Search = () => {
   const recommends = useSelector<StoreType, RecommendsStateType>(
     state => state.recommends
   );
+  const userInfo = useSelector<StoreType, UserStateType>(state => state.user);
   const filterDatas = useMemo(() => {
     const data = [...filterDefaultDatas];
     data[2] = {
       name: "城市",
       type: "radio",
       submenu: [
-        {
-          submenu: datas.citysList.map(item => {
-            return {
-              name: item,
-              value: item
-            };
-          })
-        }
+        ...datas.citysList.map(item => {
+          return {
+            name: item.title,
+            submenu: item.value.map(city => {
+              return {
+                name: city,
+                value: city
+              };
+            })
+          };
+        })
       ]
     };
     return data;
@@ -87,7 +91,15 @@ const Search = () => {
     dispatch(updateRecommendsList([]));
     const {
       data: { datas, pageNum, totalPages }
-    } = await getRecommends(1, 10, searchValue, years, education, citys);
+    } = await getRecommends(
+      1,
+      10,
+      searchValue,
+      userInfo.userInfoFromDb.tips,
+      years,
+      education,
+      citys
+    );
     if (selector) {
       setSelector(false);
     }
@@ -100,7 +112,15 @@ const Search = () => {
   const getData = async (pIndex = pageIndex) => {
     const {
       data: { datas, pageNum, totalPages }
-    } = await getRecommends(pIndex, 10, searchValue, years, education, citys);
+    } = await getRecommends(
+      pIndex,
+      10,
+      searchValue,
+      userInfo.userInfoFromDb.tips,
+      years,
+      education,
+      citys
+    );
     if (selector) {
       setSelector(false);
     }
@@ -204,17 +224,17 @@ const Search = () => {
         {selector &&
           recommends.recommendsList.length < 6 &&
           Array(9)
-            .fill(1)
-            .map(i => (
+            .fill(0)
+            .map((item, i) => (
               <AtCard
                 className={classNames("selector-item")}
-                key={i}
+                key={`${i}-selector`}
                 note={"..."}
                 extra={"..."}
                 title={"..."}
                 // thumb=""
               >
-                <View className="item skeletonBg" key={i}>
+                <View className="item skeletonBg">
                   <View className="selector-item-value"></View>
                 </View>
               </AtCard>
@@ -225,7 +245,7 @@ const Search = () => {
             return (
               <AtCard
                 className={classNames("recommend-item")}
-                key={index + item.depFullName}
+                key={index + item.depFullName + item.jobId}
                 note={`公司：${item.origin}; 工作地点：${item.workPlace}；`}
                 extra={item.reqWorkYearsName}
                 title={item.name}
@@ -238,32 +258,34 @@ const Search = () => {
 
         {list.map((item, index) => {
           return (
-            <AtCard
-              className={classNames("recommend-item")}
-              key={index + item.depFullName}
-              note={`公司：${item.origin}; 工作地点：${item.workPlace}`}
-              extra={item.reqWorkYearsName}
-              title={item.name}
-              onClick={() => {
-                dispatch(updateCurrentRecommend(item));
-                Taro.navigateTo({
-                  url: "/pages/recommendDetail/index",
-                  complete: () => {
-                    dispatch(recommendsClearType());
-                  }
-                });
-              }}
-              // thumb=""
-            >
-              <View className="itemtitle">{item.depFullName}</View>
-            </AtCard>
+            <>
+              <AtCard
+                className={classNames("recommend-item")}
+                key={index + item.depFullName + item.jobId}
+                note={`公司：${item.origin}; 工作地点：${item.workPlace}`}
+                extra={item.reqWorkYearsName}
+                title={item.name}
+                onClick={() => {
+                  dispatch(updateCurrentRecommend(item));
+                  Taro.navigateTo({
+                    url: "/pages/recommendDetail/index",
+                    complete: () => {
+                      dispatch(recommendsClearType());
+                    }
+                  });
+                }}
+                // thumb=""
+              >
+                <View className="itemtitle">{item.depFullName}</View>
+              </AtCard>
+              {index === list.length - 1 && hasMore && (
+                <View className={classNames("footer-loading")}>
+                  <AtActivityIndicator mode="center"></AtActivityIndicator>
+                </View>
+              )}
+            </>
           );
         })}
-        {hasMore && (
-          <View className={classNames("footer-loading")}>
-            <AtActivityIndicator mode="center"></AtActivityIndicator>
-          </View>
-        )}
       </ListView>
     </View>
   );

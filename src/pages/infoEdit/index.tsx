@@ -34,9 +34,19 @@ import { degreeList } from "../../utils";
 
 import classNames from "classnames";
 
+enum ToastStatus {
+  Error = "error",
+  Loading = "loading",
+  Success = "success"
+}
+
 const InfoEdit = () => {
   const [toastOpen, setToastOpen] = useState(false);
   const [schoolListShow, setSchoolListShow] = useState(false);
+  const [toastStatus, setToastStatus] = useState<ToastStatus>(
+    ToastStatus.Success
+  );
+  const [toastMessage, setToastMessage] = useState("");
   const userInfo = useSelector<StoreType, UserStateType>(state => state.user);
   const datas = useSelector<StoreType, DatasStateType>(state => state.datas);
   const schoolList = useMemo(() => datas.schoolList, [datas]);
@@ -52,17 +62,19 @@ const InfoEdit = () => {
   const submit = () => {
     if (
       !Object.keys(info).every(item => {
-        if (item === "exp") {
+        if (item === "exp" || item === "tips") {
           return true;
         } else {
           return !!info[item];
         }
       })
     ) {
-      Taro.atMessage({
-        message: "个人信息必须填写完整",
-        type: "error"
-      });
+      setToastOpen(true);
+      setToastStatus(ToastStatus.Error);
+      setToastMessage("个人信息必须填写完整");
+      setTimeout(() => {
+        setToastOpen(false);
+      }, 500);
       return;
     }
     dispatch(asyncSubmitUserInfoToDb(userInfo.accessToken, info));
@@ -108,22 +120,37 @@ const InfoEdit = () => {
     if (userInfo.actionType === SUBMITUSERINFOTODB) {
       console.log(userInfo.actionType);
       setToastOpen(true);
+      setToastStatus(ToastStatus.Success);
+      setToastMessage("更新成功");
       setTimeout(() => {
         Taro.navigateBack();
         setToastOpen(false);
         dispatch(userClearType());
       }, 500);
     } else if (userInfo.actionType === USER_ERROR) {
-      Taro.atMessage({
-        message: "更新失败",
-        type: "error"
-      });
+      setToastOpen(true);
+      setToastStatus(ToastStatus.Error);
+      setToastMessage("更新失败");
+      setTimeout(() => {
+        setToastOpen(false);
+      }, 500);
     }
   }, [userInfo]);
 
+  useEffect(() => {
+    const {
+      router: { params }
+    } = getCurrentInstance();
+    if (params.needInfo === "true") {
+      Taro.atMessage({
+        message: "请先将您的个人信息填写完整",
+        type: "error"
+      });
+    }
+  }, []);
+
   return (
-    <View className="info-edit" catchMove={true}>
-      <AtMessage />
+    <View className="info-edit">
       <AtForm
       // onSubmit={() => {
       //   submit();
@@ -132,6 +159,7 @@ const InfoEdit = () => {
       //   reset();
       // }}
       >
+        <AtMessage />
         <AtInput
           name="name"
           title="姓名"
@@ -215,6 +243,10 @@ const InfoEdit = () => {
             )}
           </View>
         </View>
+        <View className={classNames("limit-alert")}>
+          <View className="at-icon at-icon-alert-circle"></View>
+          个人信息三个月内只能更新三次！
+        </View>
         <View
           className={classNames("button-group", {
             ios: Taro.getSystemInfoSync().system.includes("iOS")
@@ -277,8 +309,8 @@ const InfoEdit = () => {
       <AtToast
         duration={0}
         isOpened={toastOpen}
-        status={"success"}
-        text={"更新成功"}
+        status={toastStatus}
+        text={toastMessage}
         hasMask
       />
     </View>

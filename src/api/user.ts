@@ -2,6 +2,19 @@ import Taro from "@tarojs/taro";
 import { UserInfoEditType } from "../store";
 import { userUrl } from "./";
 
+export const initDbInfo = async (access_token: string, userinfo: any) =>
+  await Taro.request({
+    header: {
+      AccessToken: access_token
+    },
+    url: `${userUrl}/finish`,
+    data: {
+      access_token,
+      userinfo
+    },
+    method: "POST"
+  });
+
 export const login = async (code: string) =>
   await Taro.request({
     url: `${userUrl}/login`,
@@ -32,7 +45,12 @@ export const updateUser = async (
     method: "PUT"
   });
 
-export const uploadFile = async (access_token: string, name: string, path: string, type: string) => {
+export const uploadFile = async (
+  access_token: string,
+  name: string,
+  path: string,
+  type: string
+) => {
   await Taro.uploadFile({
     url: `${userUrl}/files`,
     filePath: path,

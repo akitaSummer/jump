@@ -16,7 +16,7 @@ export type TagType = {
 
 export type DatasStateType = {
   schoolList: string[];
-  citysList: string[];
+  citysList: { title: string; value: string[] }[];
   tagsList: TagType[];
   actionType: string;
   errMsg: string;

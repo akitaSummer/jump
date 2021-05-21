@@ -39,6 +39,9 @@
         padding-right: 16px;
     }
     .degree-list {
+        .at-list__item {
+            padding-left: 32px;
+        }
         .at-list {
             padding-left: 4px;
             &::after {
@@ -77,4 +80,19 @@
             }
         }
     }
+    .limit-alert {
+        color: red;
+        font-size: 24px;
+        padding: 24px 18px 24px 0;
+        width: 100%;
+        min-height: 48px;
+        margin-left: 32px;
+        .at-icon {
+            margin-right: 12px;
+        }
+    }
+}
+
+.info-edit-message {
+    z-index: 1000;
 }

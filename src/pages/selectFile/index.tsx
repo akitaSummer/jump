@@ -206,6 +206,21 @@ const SelectFile = () => {
           disabled={!selectFile}
           className={classNames("submit-button")}
           onClick={async () => {
+            if (
+              !userInfo.userInfoFromDb.phone ||
+              !userInfo.userInfoFromDb.email
+            ) {
+              Taro.atMessage({
+                message: "请先将您的个人信息填写完整",
+                type: "error"
+              });
+              return Taro.navigateTo({
+                url: "/pages/infoEdit/index?needInfo=true",
+                complete: () => {
+                  dispatch(userClearType());
+                }
+              });
+            }
             if (!selectFile) return;
             setToastOpen(true);
             try {

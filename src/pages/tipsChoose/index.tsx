@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { View, ScrollView, Text } from "@tarojs/components";
 import Taro from "@tarojs/taro";
 import { AtButton, AtMessage } from "taro-ui";
@@ -8,9 +8,7 @@ import {
   StoreType,
   UserStateType,
   updateUserInfoEditTips,
-  DatasStateType,
-  UPDATE_USERINFOEDITTIPS,
-  userClearType
+  DatasStateType
 } from "../../store";
 
 import classNames from "classnames";
@@ -20,9 +18,27 @@ const TipsChoose = () => {
   const datas = useSelector<StoreType, DatasStateType>(state => state.datas);
   const dispatch = useDispatch();
   const [saveClick, setSaveClick] = useState(false);
-  const [activeTrade, setActiveTrade] = useState(datas.tagsList[0].name);
+  const [activeTrade, setActiveTrade] = useState(datas.tagsList[0]?.name || "");
+  const hasTips = useMemo(
+    () =>
+      Array.isArray(datas.tagsList)
+        ? datas.tagsList
+            .map(item =>
+              item.children.map(title => title.children.map(tips => tips.name))
+            )
+            .flat(5)
+        : [],
+    [datas]
+  );
+
   const [tips, setTips] = useState(
-    userInfo.userInfoEdit.tips ? [...userInfo.userInfoEdit.tips.split(",")] : []
+    userInfo.userInfoEdit.tips
+      ? [
+          ...userInfo.userInfoEdit.tips
+            .split(",")
+            .filter(item => hasTips.includes(item))
+        ]
+      : []
   );
 
   const handleTradeChange = (item: string) => {
@@ -64,6 +80,7 @@ const TipsChoose = () => {
       }
     };
   }, [saveClick]);
+  console.log();
 
   return (
     <View
@@ -74,44 +91,46 @@ const TipsChoose = () => {
       <AtMessage />
       <View className="tips-choose" catchMove={true}>
         <ScrollView scrollY className={classNames("trade")}>
-          {datas.tagsList.map((item, i) => (
-            <View
-              className={classNames("trade-item", {
-                "trade-item-active": item.name === activeTrade
-              })}
-              onClick={() => {
-                handleTradeChange(item.name);
-              }}
-            >
-              <Text className="content">{item.name}</Text>
-            </View>
-          ))}
+          {Array.isArray(datas.tagsList) &&
+            datas.tagsList.map((item, i) => (
+              <View
+                className={classNames("trade-item", {
+                  "trade-item-active": item.name === activeTrade
+                })}
+                onClick={() => {
+                  handleTradeChange(item.name);
+                }}
+              >
+                <Text className="content">{item.name}</Text>
+              </View>
+            ))}
         </ScrollView>
         <ScrollView scrollY className={classNames("tips")}>
           <View className={classNames("box")}>
             <View className="labels">
-              {datas.tagsList
-                .filter(item => item.name === activeTrade)[0]
-                .children.map((item, i) => (
-                  <>
-                    <View className={"title"}>{item.name}</View>
-                    <View key={item.name + i} className={"labels"}>
-                      {item.children.map(tag => (
-                        <View
-                          key={tag.name + i}
-                          className={classNames("tips-item", {
-                            "tips-item-active": tips.includes(tag.name)
-                          })}
-                          onClick={() => {
-                            handleTipsClick(tag.name);
-                          }}
-                        >
-                          {tag.name}
-                        </View>
-                      ))}
-                    </View>
-                  </>
-                ))}
+              {Array.isArray(datas.tagsList) &&
+                datas.tagsList
+                  .filter(item => item.name === activeTrade)[0]
+                  ?.children.map((item, i) => (
+                    <>
+                      <View className={"title"}>{item.name}</View>
+                      <View key={item.name + i} className={"labels"}>
+                        {item.children.map(tag => (
+                          <View
+                            key={tag.name + i}
+                            className={classNames("tips-item", {
+                              "tips-item-active": tips.includes(tag.name)
+                            })}
+                            onClick={() => {
+                              handleTipsClick(tag.name);
+                            }}
+                          >
+                            {tag.name}
+                          </View>
+                        ))}
+                      </View>
+                    </>
+                  ))}
             </View>
           </View>
         </ScrollView>

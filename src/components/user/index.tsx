@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import classnames from "classnames";
 import { View, Text } from "@tarojs/components";
 import { AtAvatar, AtToast, AtButton, AtTag } from "taro-ui";
-import Taro from "@tarojs/taro";
+import Taro, { getUserInfo } from "@tarojs/taro";
 import { useSelector, useDispatch } from "react-redux";
 
 import {
@@ -15,7 +15,12 @@ import {
   USER_ERROR,
   asyncGetFiles
 } from "../../store";
-import { wxLogin, login as dbLogin } from "../../api";
+import {
+  wxLogin,
+  login as dbLogin,
+  wxGetUserInfo,
+  initDbInfo
+} from "../../api";
 
 import "./index.scss";
 
@@ -73,15 +78,18 @@ const User: React.FC<{}> = () => {
   const userInfo = useSelector<StoreType, UserStateType>(state => state.user);
   const dispatch = useDispatch();
 
-  const login = async () => {
+  const login = async (userInfo: any) => {
     setToastOpen(true);
     setToastMask(true);
     setToastStatus(ToastStatus.Loading);
     try {
       const wxRes = await wxLogin();
       const {
-        data: { access_token }
+        data: { access_token, id }
       } = await dbLogin(wxRes.code);
+      if (!id) {
+        await initDbInfo(access_token, userInfo);
+      }
       Taro.setStorageSync("loginSessionKey", access_token);
       dispatch(updateAccessToken(access_token));
       dispatch(asyncUpdateUserInfoFromDb(access_token));
@@ -141,7 +149,7 @@ const User: React.FC<{}> = () => {
         onClick={() => {
           userInfo.userInfoFromDb.nickname && userInfo.accessToken
             ? goToInfoEdit()
-            : login();
+            : wxGetUserInfo().then(({ userInfo }) => login(userInfo));
         }}
       >
         <View className={classnames("at-col", "avatar")}>
@@ -159,7 +167,14 @@ const User: React.FC<{}> = () => {
             </Text>
           ) : (
             <View style={{ width: 48 }}>
-              <AtButton type="secondary" size="small" circle>
+              <AtButton
+                type="secondary"
+                size="small"
+                circle
+                // onClick={() =>
+                //   wxGetUserInfo().then(({ userInfo }) => login(userInfo))
+                // }
+              >
                 登录
               </AtButton>
             </View>
