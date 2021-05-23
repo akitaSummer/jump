@@ -6,7 +6,8 @@ export default {
     "pages/fileDetail/index",
     "pages/webView/index",
     "pages/recommendDetail/index",
-    "pages/selectFile/index"
+    "pages/selectFile/index",
+    "pages/comment/index"
   ],
   window: {
     backgroundTextStyle: "light",

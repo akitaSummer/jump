@@ -168,6 +168,20 @@ export const asyncSubmitUserInfoToDb = (
         });
       throw new Error(errMsg);
     }
+    const {
+      data,
+      statusCode: userStatusCode,
+      errMsg: userErrMsg
+    } = await getUserInfo(access_token);
+    if (userStatusCode < 200 || userStatusCode >= 300) {
+      if (userStatusCode === 403)
+        Taro.atMessage({
+          message: "个人信息只能三个月修改三次！",
+          type: "error"
+        });
+      throw new Error(userErrMsg);
+    }
+    dispatch(updateUserInfoFromDb(data));
     dispatch(submitUserInfoToDb(info));
   } catch (e) {
     dispatch(submitUserInfoToDb());

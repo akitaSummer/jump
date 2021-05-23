@@ -19,3 +19,20 @@ export const getTags = async () =>
     url: `${recommendsUrl}/tags`,
     method: "GET"
   });
+
+export const submitComment = async (
+  access_token: string,
+  id: number,
+  comment: string
+) =>
+  await Taro.request({
+    url: `${userUrl}/comment`,
+    method: "POST",
+    data: {
+      comment,
+      id
+    },
+    header: {
+      AccessToken: access_token
+    }
+  });

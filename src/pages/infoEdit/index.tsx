@@ -21,6 +21,7 @@ import {
   DatasStateType,
   UserStateType,
   asyncSubmitUserInfoToDb,
+  asyncUpdateUserInfoFromDb,
   userClearType,
   updateUserInfoEdit,
   asyncUpdateSchoolList,
@@ -118,7 +119,6 @@ const InfoEdit = () => {
 
   useEffect(() => {
     if (userInfo.actionType === SUBMITUSERINFOTODB) {
-      console.log(userInfo.actionType);
       setToastOpen(true);
       setToastStatus(ToastStatus.Success);
       setToastMessage("更新成功");
@@ -190,7 +190,7 @@ const InfoEdit = () => {
           </View>
           <Text
             className={classNames("item-value", {
-              "item-empty": info.school
+              "item-empty": !info.school
             })}
             onClick={() => {
               setSchoolListShow(true);

@@ -247,6 +247,25 @@ const User: React.FC<{}> = () => {
           </View>
         </View>
       )}
+      {userInfo.userInfoFromDb.nickname && userInfo.userInfoFromDb.id && (
+        <View
+          className={classnames("info_item")}
+          onClick={() => {
+            Taro.navigateTo({
+              url: "/pages/comment/index",
+              complete: () => {
+                dispatch(userClearType());
+              }
+            });
+          }}
+        >
+          <View className={classnames("iconfont", "icon-comment")}></View>
+          <Text className={classnames("item_name")}>意见反馈</Text>
+          <View className={classnames("value-right")}>
+            <View className={classnames("at-icon", "at-icon-chevron-right")} />
+          </View>
+        </View>
+      )}
       <AtToast
         duration={0}
         isOpened={toastOpen}
