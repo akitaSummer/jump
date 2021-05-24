@@ -1,3 +1,13 @@
+import Taro from "@tarojs/taro";
+
+export const changeNavBarTitle = async (title: string) => {
+  const { platform } = await Taro.getSystemInfo();
+  platform !== "android" &&
+    Taro.setNavigationBarTitle({
+      title
+    });
+};
+
 export const degreeList = ["大专", "本科", "硕士", "博士"];
 export const tipsList = [
   {

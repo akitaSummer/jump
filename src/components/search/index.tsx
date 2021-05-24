@@ -15,7 +15,7 @@ import {
   updateCurrentRecommend,
   UserStateType
 } from "../../store";
-import { filterDatas as filterDefaultDatas } from "../../utils";
+import { filterDatas as filterDefaultDatas, changeNavBarTitle } from "../../utils";
 import { getRecommends } from "../../api";
 import FilterDropdown from "../filterDropdown";
 import "./index.scss";
@@ -172,9 +172,7 @@ const Search = () => {
   }, []);
 
   useEffect(() => {
-    Taro.setNavigationBarTitle({
-      title: "跳一下"
-    });
+    changeNavBarTitle('UFreedom')
   }, []);
 
   useEffect(() => {

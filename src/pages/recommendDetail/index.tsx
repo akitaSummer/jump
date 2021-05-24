@@ -1,7 +1,11 @@
 import React, { useEffect, useState, useMemo } from "react";
 import classnames from "classnames";
 import { View, Text, ScrollView } from "@tarojs/components";
-import Taro from "@tarojs/taro";
+import Taro, {
+  getCurrentInstance,
+  useShareAppMessage,
+  useShareTimeline
+} from "@tarojs/taro";
 import { AtButton, AtToast } from "taro-ui";
 import { useSelector, useDispatch } from "react-redux";
 
@@ -16,7 +20,13 @@ import {
   UPDATE_USERINFOFROMDB,
   USER_ERROR
 } from "../../store";
-import { wxLogin, login as dbLogin } from "../../api";
+import {
+  wxLogin,
+  login as dbLogin,
+  initDbInfo,
+  wxGetUserInfo,
+  getRecommends
+} from "../../api";
 
 import classNames from "classnames";
 
@@ -53,15 +63,18 @@ const RecommendDetail = () => {
     };
   }, []);
 
-  const login = async () => {
+  const login = async (userInfo: any) => {
     setToastOpen(true);
     setToastMask(true);
     setToastStatus(ToastStatus.Loading);
     try {
       const wxRes = await wxLogin();
       const {
-        data: { access_token }
+        data: { access_token, id }
       } = await dbLogin(wxRes.code);
+      if (!id) {
+        await initDbInfo(access_token, userInfo);
+      }
       Taro.setStorageSync("loginSessionKey", access_token);
       dispatch(updateAccessToken(access_token));
       dispatch(asyncUpdateUserInfoFromDb(access_token));
@@ -71,6 +84,14 @@ const RecommendDetail = () => {
       setToastStatus(ToastStatus.Error);
       setToastMask(false);
     }
+  };
+
+  const getRecommendInfoById = async (id: string) => {
+    const {
+      data: { datas }
+    } = await getRecommends(1, 10, id, "");
+
+    dispatch(updateCurrentRecommend(datas[0]));
   };
 
   useEffect(() => {
@@ -98,6 +119,34 @@ const RecommendDetail = () => {
       }, 500);
     }
   }, [toastStatus]);
+
+  useEffect(() => {
+    const {
+      router: { params }
+    } = getCurrentInstance();
+    if (params.id) {
+      dispatch(updateCurrentRecommend());
+      getRecommendInfoById(params.id);
+    }
+  }, []);
+
+  useShareAppMessage(res => {
+    // if (res.from === 'button') {
+    //   // 来自页面内转发按钮
+    //   console.log(res.target)
+    // }
+    return {
+      title: `${recommendInfo.name}`,
+      path: `/pages/recommendDetail/index?id=${recommendInfo.jobId}`
+    };
+  });
+
+  useShareTimeline(() => {
+    return {
+      title: `${recommendInfo.name}`,
+      path: `/pages/recommendDetail/index?id=${recommendInfo.jobId}`
+    };
+  });
 
   return (
     <View
@@ -278,7 +327,7 @@ const RecommendDetail = () => {
               ? Taro.navigateTo({
                   url: "/pages/selectFile/index"
                 })
-              : login();
+              : wxGetUserInfo().then(({ userInfo }) => login(userInfo));
           }}
         >
           {userInfo.userInfoFromDb.nickname ? "投个简历" : "请先登录"}

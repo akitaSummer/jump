@@ -12,7 +12,7 @@ export default {
   window: {
     backgroundTextStyle: "light",
     navigationBarBackgroundColor: "#fff",
-    navigationBarTitleText: "跳一下",
+    navigationBarTitleText: "",
     navigationBarTextStyle: "black"
   }
 };

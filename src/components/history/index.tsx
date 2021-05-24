@@ -19,7 +19,14 @@ import {
   UPDATE_USERINFOFROMDB,
   USER_ERROR
 } from "../../store";
-import { getHistoryList, wxLogin, login as dbLogin } from "../../api";
+import {
+  getHistoryList,
+  wxLogin,
+  login as dbLogin,
+  wxGetUserInfo,
+  initDbInfo
+} from "../../api";
+import { changeNavBarTitle } from "../../utils";
 import FilterDropdown from "../filterDropdown";
 import "./index.scss";
 
@@ -434,15 +441,18 @@ const History: React.FC = props => {
     setFilterStatus(status || "");
   };
 
-  const login = async () => {
+  const login = async (userInfo: any) => {
     setToastOpen(true);
     setToastMask(true);
     setToastStatus(ToastStatus.Loading);
     try {
       const wxRes = await wxLogin();
       const {
-        data: { access_token }
+        data: { access_token, id }
       } = await dbLogin(wxRes.code);
+      if (!id) {
+        await initDbInfo(access_token, userInfo);
+      }
       Taro.setStorageSync("loginSessionKey", access_token);
       dispatch(updateAccessToken(access_token));
       dispatch(asyncUpdateUserInfoFromDb(access_token));
@@ -486,9 +496,7 @@ const History: React.FC = props => {
   }, [toastStatus]);
 
   useEffect(() => {
-    Taro.setNavigationBarTitle({
-      title: "进度查询"
-    });
+    changeNavBarTitle("进度查询");
     setIsFirst(false);
     // @ts-ignore
     // if (userInfo.accessToken) refList.current.fetchInit();
@@ -601,7 +609,7 @@ const History: React.FC = props => {
             className={classNames("login")}
             type="primary"
             onClick={() => {
-              login();
+              wxGetUserInfo().then(({ userInfo }) => login(userInfo));
             }}
           >
             登录

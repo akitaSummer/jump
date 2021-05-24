@@ -21,6 +21,7 @@ import {
   wxGetUserInfo,
   initDbInfo
 } from "../../api";
+import { changeNavBarTitle } from '../../utils'
 
 import "./index.scss";
 
@@ -111,9 +112,7 @@ const User: React.FC<{}> = () => {
   };
 
   useEffect(() => {
-    Taro.setNavigationBarTitle({
-      title: "我的"
-    });
+    changeNavBarTitle('我的')
   }, []);
 
   useEffect(() => {

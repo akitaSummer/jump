@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { View, Text } from "@tarojs/components";
-import Taro from "@tarojs/taro";
+import { useShareAppMessage, useShareTimeline } from "@tarojs/taro";
 import { AtButton, AtTabBar } from "taro-ui";
 import { useSelector, useDispatch } from "react-redux";
 
@@ -42,6 +42,24 @@ const Index = () => {
       console.log(e);
     }
   };
+
+  useShareAppMessage(res => {
+    // if (res.from === 'button') {
+    //   // 来自页面内转发按钮
+    //   console.log(res.target)
+    // }
+    return {
+      title: "UFreedom",
+      path: "/pages/index/index"
+    };
+  });
+
+  useShareTimeline(() => {
+    return {
+      title: "UFreedom",
+      path: "/pages/index/index"
+    };
+  });
 
   useEffect(() => {
     getUserMessage();
